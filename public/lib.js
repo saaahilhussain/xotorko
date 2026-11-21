@@ -12,6 +12,8 @@
     s02: "প্ৰিয় গ্ৰাহক, আপোনাৰ বিদ্যুৎ সংযোগ আজি নিশা ৯:৩০ বজাত বিচ্ছিন্ন কৰা হ'ব। বিল আপডেট নাই। লগে লগে এই নম্বৰত যোগাযোগ কৰক 9000000012",
     s04: 'Dear SBI Customer, your YONO account will be blocked today due to pending PAN/KYC. Update now: https://sbi-kyc-verify.top/login',
     s13: 'Hi, I am sending you Rs 5000 for the OLX item. Please accept the request on your UPI app and enter your PIN to receive the money.',
+    // Not in the eval set: added for the demo only.
+    loan: 'Congratulations! You are pre-approved for an instant loan of Rs 50,000. No documents needed. Download the app now and pay Rs 499 processing fee: http://quickloan-approve.xyz/QuickLoan.apk',
   };
 
   const STATES = ['nothing', 'clicked', 'shared_otp', 'paid', 'installed_app'];

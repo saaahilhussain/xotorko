@@ -146,7 +146,17 @@ describe('i18n', () => {
   test('examples match the eval fixtures', () => {
     const fixtures = require('./fixtures/eval.json');
     const items = Array.isArray(fixtures) ? fixtures : fixtures.items;
-    for (const [id, text] of Object.entries(L.EXAMPLES)) expect(items.find((i) => i.id === id).text).toBe(text);
+    for (const id of ['s02', 's04', 's13']) expect(items.find((i) => i.id === id).text).toBe(L.EXAMPLES[id]);
+  });
+
+  test('every example chip in index.html has text and a label in all languages', () => {
+    const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'index.html'), 'utf8');
+    const ids = [...html.matchAll(/data-example="(\w+)" data-i18n="(\w+)"/g)];
+    expect(ids.map((m) => m[1])).toEqual(['s02', 's04', 's13', 'loan']);
+    for (const [, id, key] of ids) {
+      expect(typeof L.EXAMPLES[id]).toBe('string');
+      for (const lang of I18N.LANGS) expect(I18N.STRINGS[lang][key]).toBeTruthy();
+    }
   });
 });
 

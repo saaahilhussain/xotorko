@@ -122,3 +122,33 @@ describe('detectRequestedActions (limited mode)', () => {
     expect(asks('মা, মই ৰাতি ৯ বজাত ঘৰ পাম।')).toEqual([]);
   });
 });
+
+describe('loan bait (limited mode)', () => {
+  test.each([
+    'You are pre-approved for an instant loan of Rs 50,000',
+    'Get a loan with no documents needed',
+    'Pay Rs 499 processing fee to release the loan',
+    'Bina document turant loan milega',
+    'तुरंत लोन पाएँ',
+  ])('%s', (text) => {
+    expect(cats(text)).toContain('loan_bait');
+  });
+
+  test('ordinary loan statements are not bait', () => {
+    expect(cats('Your home loan EMI of Rs 12,400 is due on 05-12-26.')).not.toContain('loan_bait');
+  });
+
+  test('the demo loan chip text is high risk in limited mode', async () => {
+    const { analyzeText } = require('../lib/analyze');
+    const prev = process.env.GEMINI_API_KEY;
+    delete process.env.GEMINI_API_KEY;
+    try {
+      const r = await analyzeText(require('../public/lib').EXAMPLES.loan, { demoCache: false });
+      expect(r.limited_mode).toBe(true);
+      expect(r.verdict).toBe('high_risk');
+      expect(r.evidence.message.map((t) => t.exact_span)).toEqual(expect.arrayContaining(['pre-approved']));
+    } finally {
+      if (prev !== undefined) process.env.GEMINI_API_KEY = prev;
+    }
+  });
+});
