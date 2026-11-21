@@ -2,7 +2,13 @@
   "name": "xotorko",
   "version": "0.1.0",
   "private": true,
-  "description": "Xotorko hackathon project skeleton",
+  "description": "Scam message triage for Assam: evidence, a verdict that never says safe, and the exact next step (Assamese, Hindi, English).",
+  "license": "MIT",
+  "author": "Sahil Hussain",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saaahilhussain/xotorko.git"
+  },
   "main": "server.js",
   "engines": {
     "node": "24.x"
@@ -10,8 +16,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "jest",
-    "eval": "node scripts/eval.js",
-    "test:coverage": "jest --coverage --collectCoverageFrom=lib/**/*.js --collectCoverageFrom=services/**/*.js --collectCoverageFrom=routes/**/*.js --collectCoverageFrom=server.js --collectCoverageFrom=public/lib.js --collectCoverageFrom=public/i18n.js"
+    "test:coverage": "jest --coverage --collectCoverageFrom=lib/**/*.js --collectCoverageFrom=services/**/*.js --collectCoverageFrom=routes/**/*.js --collectCoverageFrom=server.js --collectCoverageFrom=public/lib.js --collectCoverageFrom=public/i18n.js",
+    "eval": "node scripts/eval.js"
   },
   "dependencies": {
     "@google/genai": "^3.6.1",

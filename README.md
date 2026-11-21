@@ -2,7 +2,7 @@
 
 **Check a suspicious message. Know what to do next.** Paste an SMS or WhatsApp message in Assamese, Hindi or English. Xotorko shows the evidence, gives a verdict that never says "safe", then asks *"What have you already done?"* and gives the exact next step: 1930, your bank, or Chakshu.
 
-**Live:** https://xotorko-359115993544.asia-south1.run.app
+**Live:** https://xotorko-359115993544.asia-south1.run.app · **Repo:** https://github.com/saaahilhussain/xotorko · MIT licence
 
 ## Problem (PS01)
 
@@ -76,6 +76,7 @@ Real model, 30 hand-labelled messages (15 scam, 15 genuine; English, Assamese sc
 - **Translations:** the Assamese and Hindi text has not yet been reviewed by native speakers. Server-written explanations are in English.
 - **Per-instance counters:** the daily cap and rate limits are counted in memory per instance and reset on restart.
 - **Text only:** no screenshots, voice calls or forwarded-chain parsing.
+- **Cold start:** with `--min-instances 0`, the first request after an idle period takes about 10 s; warm requests take about 1 s. `--min-instances 1` removes the delay at a small fixed cost.
 - **No guarantees:** "No strong scam signs found" always comes with a disclaimer. Xotorko never says a message is safe.
 
 Demo script: [docs/DEMO.md](docs/DEMO.md). Security: [SECURITY.md](SECURITY.md).

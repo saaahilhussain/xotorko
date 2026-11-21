@@ -1,0 +1,18 @@
+# Files excluded from `gcloud run deploy --source .`
+# Runtime needs: server.js, lib/, services/, routes/, public/, data/, package*.json.
+.gcloudignore
+.git
+.gitignore
+#!include:.gitignore
+# (.gitignore already excludes node_modules/, .env, .env.*, coverage/, *.log)
+.env
+.env.*
+tests/
+coverage/
+docs/
+scripts/
+*.md
+LICENSE
+.github/
+.vscode/
+.idea/

@@ -214,7 +214,8 @@
   function renderMessageEvidence(r) {
     list('ev-message', r.evidence.message.map((tac) => el('li', {},
       el('strong', {}, `${t(`tac_${tac.type}`)}: `),
-      `“${tac.exact_span}” — ${tac.explanation}`,
+      `“${tac.exact_span}” — `,
+      el('span', { lang: 'en' }, tac.explanation), // server text is English
     )), t('msg_none'));
   }
 
@@ -222,7 +223,7 @@
     // One block per domain: the (defanged) domain as a heading, reasons below.
     const items = L.groupLinksByDomain(r.evidence.link).map((g) => {
       const reasons = g.signals.length
-        ? g.signals.map((sig) => el('li', { class: L.LINK_WARNINGS.includes(sig.type) ? 'ev-warn' : 'ev-info' }, sig.reason))
+        ? g.signals.map((sig) => el('li', { class: L.LINK_WARNINGS.includes(sig.type) ? 'ev-warn' : 'ev-info', lang: 'en' }, sig.reason))
         : [el('li', { class: 'empty' }, t('link_clean'))];
       return el('li', { class: 'ev-domain' },
         el('h4', { class: 'ev-host' }, L.defang(g.host)),
@@ -254,7 +255,7 @@
         : el('span', { class: 'cc-nomatch' }, '✗ ', t('cc_nomatch')));
     }
     if (cc.official_sms_sender_id) row(t('cc_sender_id'), cc.official_sms_sender_id);
-    if (cc.note) dl.append(el('dd', { class: 'step-note' }, cc.note));
+    if (cc.note) dl.append(el('dd', { class: 'step-note', lang: 'en' }, cc.note));
     box.hidden = false;
   }
 
@@ -320,7 +321,7 @@
       out.push(el('a', { class: 'btn btn-call', href: `tel:${ch.tel}` }, `📞 ${t('call_btn', { tel: ch.tel })}`));
     }
     if (ch.url && /^https:\/\//.test(ch.url)) {
-      out.push(el('a', { class: 'btn btn-secondary', href: ch.url, target: '_blank', rel: 'noopener noreferrer' }, ch.label, newTabHint()));
+      out.push(el('a', { class: 'btn btn-secondary', href: ch.url, target: '_blank', rel: 'noopener noreferrer' }, el('span', { lang: 'en' }, ch.label), newTabHint()));
     }
     return out;
   }
@@ -334,7 +335,7 @@
       const controls = [];
       if (step.channel) {
         controls.push(...channelControls(step.channel));
-        if (step.channel.how) li.append(el('p', { class: 'step-note' }, step.channel.how));
+        if (step.channel.how) li.append(el('p', { class: 'step-note', lang: 'en' }, step.channel.how));
       }
       if (step.action === 'copy_report') {
         controls.push(el('button', { type: 'button', class: 'btn btn-secondary', 'data-do': 'copy' }, t('copy_report')));

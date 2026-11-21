@@ -106,7 +106,7 @@ function render({ rows, TP, TN, FP, FN, precision, recall, misclassified, useGem
     '- **Gemini is non-deterministic.** Results can change between runs and model versions even at low temperature. Responses are cached per process only.',
     '- **Messages are synthetic.** They are modelled on real formats with fictional numbers and domains. Real messages are messier: typos, mixed scripts, forwarded chains, screenshots.',
     '- **Entity coverage is limited.** `data/genuine.json` covers ~16 high-impersonation organisations. Lookalike and channel checks do nothing for brands outside that list.',
-    '- **Lookalike matching is substring-based**, so a legitimate third-party domain that contains a brand name (e.g. a news site about SBI) would be flagged.',
+    '- **Lookalike matching is token-based**: a domain is flagged when one of its tokens equals a brand token (e.g. `sbi` in `sbi-kyc-verify.top`), so a legitimate third-party domain such as `sbi-news.com` would also be flagged.',
     '- **"Not high_risk" is not a clean bill of health.** `no_strong_indicators` always ships with a disclaimer and never says the message is genuine.',
     '',
   );
