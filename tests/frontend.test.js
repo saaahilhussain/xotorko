@@ -45,6 +45,27 @@ describe('GET / (index.html)', () => {
   });
 });
 
+describe('asset versioning', () => {
+  test('index.html references every local asset with a content-hash version', async () => {
+    const res = await request(app).get('/').expect(200);
+    const refs = [...res.text.matchAll(/(?:src|href)="(\/[\w.-]+\.(?:js|css|svg)[^"]*)"/g)].map((m) => m[1]);
+    expect(refs.length).toBeGreaterThanOrEqual(5);
+    refs.forEach((r) => expect(r).toMatch(new RegExp(`\\?v=${app.ASSET_VERSION}$`)));
+    expect(app.ASSET_VERSION).toMatch(/^[0-9a-f]{12}$/);
+  });
+
+  test('/index.html is served the same way as /', async () => {
+    const a = await request(app).get('/').expect(200);
+    const b = await request(app).get('/index.html').expect(200);
+    expect(b.text).toBe(a.text);
+    expect(b.headers['cache-control']).toBe('no-cache');
+  });
+
+  test('versioned asset URLs are served', async () => {
+    await request(app).get(`/app.js?v=${app.ASSET_VERSION}`).expect(200).expect('Content-Type', /javascript/);
+  });
+});
+
 describe('static assets', () => {
   test.each(['/app.js', '/lib.js', '/i18n.js', '/styles.css'])('%s is served with public caching', async (url) => {
     const res = await request(app).get(url).expect(200);

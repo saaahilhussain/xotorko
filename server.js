@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('node:path');
+const fs = require('node:fs');
+const crypto = require('node:crypto');
 const helmet = require('helmet');
 const compression = require('compression');
 const { rateLimit } = require('express-rate-limit');
@@ -62,15 +64,33 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api', apiRouter);
 
-// Static assets: short public caching for CSS/JS (not fingerprinted, so keep it
-// modest); HTML is revalidated on every load so a deploy is visible at once.
-const STATIC_MAX_AGE_S = 60 * 60;
+// Static files. Asset URLs in index.html carry a content hash (?v=...), computed
+// at startup, so a deploy changes every URL at once: HTML is revalidated on each
+// load (no-cache + ETag) and versioned CSS/JS can be cached for a day.
+const PUBLIC_DIR = path.join(__dirname, 'public');
+const ASSET_MAX_AGE_S = 24 * 60 * 60;
+const ASSET_VERSION = (() => {
+  const hash = crypto.createHash('sha256');
+  for (const f of fs.readdirSync(PUBLIC_DIR).sort()) {
+    if (f !== 'index.html') hash.update(f).update(fs.readFileSync(path.join(PUBLIC_DIR, f)));
+  }
+  return hash.digest('hex').slice(0, 12);
+})();
+const INDEX_HTML = fs
+  .readFileSync(path.join(PUBLIC_DIR, 'index.html'), 'utf8')
+  .replace(/(src|href)="\/([\w.-]+\.(?:js|css|svg))"/g, `$1="/$2?v=${ASSET_VERSION}"`);
+
+app.get(['/', '/index.html'], (req, res) => {
+  res.set('Cache-Control', 'no-cache');
+  res.type('html').send(INDEX_HTML);
+});
+
 app.use(
-  express.static(path.join(__dirname, 'public'), {
+  express.static(PUBLIC_DIR, {
+    index: false,
     etag: true,
-    setHeaders(res, filePath) {
-      if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
-      else res.setHeader('Cache-Control', `public, max-age=${STATIC_MAX_AGE_S}`);
+    setHeaders(res) {
+      res.setHeader('Cache-Control', `public, max-age=${ASSET_MAX_AGE_S}`);
     },
   }),
 );
@@ -103,3 +123,4 @@ if (require.main === module) {
 }
 
 module.exports = app;
+module.exports.ASSET_VERSION = ASSET_VERSION;
