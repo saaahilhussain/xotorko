@@ -4,11 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Xotorko</title>
+    <script src="/app.js" defer></script>
   </head>
   <body>
     <main>
       <h1>Xotorko</h1>
-      <p>Project setup is ready.</p>
+      <p>Paste a suspicious message to check it for scam signs.</p>
+      <form id="analyze-form" novalidate>
+        <label for="message">Message</label>
+        <br>
+        <textarea id="message" name="text" rows="8" cols="60" maxlength="2000" required
+          aria-describedby="message-help"></textarea>
+        <p id="message-help">Up to 2000 characters. Phone numbers, codes and account numbers are masked before analysis. Nothing is stored.</p>
+        <button type="submit" id="submit">Check message</button>
+      </form>
+      <h2>Result</h2>
+      <pre id="result" role="status" aria-live="polite"></pre>
     </main>
   </body>
 </html>
