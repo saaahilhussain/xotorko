@@ -21,7 +21,6 @@
   --focus: #1c1b1a;       /* ink ring, offset 2px so it sits on the page colour (16:1+) */
 
   /* Highlights */
-  --quote-bg: #f3eee6;    /* quoted message block; ink 14.9:1 */
   --mark-bg: #ffe2a0;     /* warm amber; ink text 13.6:1 */
   --tag-bg: #5c3b00;      /* white text: 10:1 */
 
@@ -214,7 +213,7 @@ textarea:focus { border-color: var(--red); }
    heading; every later section starts with a 1px hairline and --section-gap. */
 .result > * { margin-top: 0; margin-bottom: 0; }
 .result > * + * { margin-top: var(--section-gap); }
-.result > .verdict-label,
+.result > #verdict,
 .result > #badges,
 .result > h3 + .message-view { margin-top: var(--space-3); }
 .result > h3,
@@ -222,20 +221,19 @@ textarea:focus { border-color: var(--red); }
 .result > .channel,
 .result > .done,
 .result > .share { border-top: 1px solid var(--border); padding-top: var(--section-gap); }
-.result > #verdict { margin-top: var(--space-2); }
 .badges:empty { display: none; }
 
 .verdict-line {
   display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem;
   padding: 0.45rem 0.7rem; border-radius: var(--radius-btn);
-  border: 1px solid;
+  border: 1px solid; border-left-width: 5px;
 }
 .verdict-line a { color: inherit; font-weight: 600; }
 .verdict-line-icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 1.4rem; height: 1.4rem; border-radius: 50%; font-weight: 800; font-size: 0.9rem; color: #fff;
 }
-.verdict-line-high_risk { background: var(--risk-bg); color: var(--risk-fg); border-color: var(--red-tint-border); }
+.verdict-line-high_risk { background: var(--risk-bg); color: var(--risk-fg); border-color: var(--red-tint-border); border-left-color: var(--red); }
 .verdict-line-high_risk .verdict-line-icon { background: var(--red); }
 .verdict-line-unable_to_verify { background: var(--warn-bg); color: var(--warn-fg); border-color: var(--warn-border); }
 .verdict-line-unable_to_verify .verdict-line-icon { background: var(--warn-fg); }
@@ -254,9 +252,8 @@ textarea:focus { border-color: var(--red); }
 }
 
 .message-view {
-  margin-inline: 0; padding: var(--space-4);
-  background: var(--quote-bg); border: 0; border-radius: 4px;
-  font-size: 1.0625rem; line-height: 1.7;
+  margin-inline: 0; padding: var(--space-3) var(--space-4);
+  background: var(--bg); border-left: 4px solid var(--border-strong); border-radius: 8px;
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
 mark {
@@ -293,36 +290,24 @@ mark {
 .cc-match { color: var(--ok-fg); font-weight: 700; }
 .cc-nomatch { color: var(--risk-fg); font-weight: 700; }
 
-/* Verdict: no box. Small label, then the verdict word as a large heading in
-   the state colour with its icon, the explanation in ink, and a 2px rule in
-   the state colour underneath. Icon + word keep states distinct without colour. */
-.verdict-label {
-  font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--muted);
-}
 .verdict {
-  --verdict-size: 1.625rem; /* 26px; 32px on desktop */
-  display: grid; grid-template-columns: auto 1fr; align-items: center;
-  column-gap: var(--space-2); row-gap: var(--space-2);
-  background: none; border: 0; border-bottom: 2px solid currentColor; border-radius: 0;
-  padding: 0 0 var(--space-4);
+  display: flex; gap: var(--space-3); align-items: flex-start;
+  border: 0; border-left: 4px solid; border-radius: 0;
+  padding: var(--space-3) var(--space-4);
 }
-.verdict > div { display: contents; }
-.verdict p { margin: 0; }
 .verdict-icon {
-  grid-column: 1; grid-row: 1;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: calc(var(--verdict-size) * 0.6); font-weight: 800; line-height: 1;
-  width: 1.2em; height: 1.2em; /* about the cap height of the title */
-  border: 0.13em solid currentColor; border-radius: 50%;
-  color: inherit; background: none;
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  font-size: 1.3rem; font-weight: 800; color: #fff;
 }
-.verdict-title { grid-column: 2; grid-row: 1; font-size: var(--verdict-size); line-height: 1.2; letter-spacing: -0.015em; }
-.verdict-title strong { font-weight: 700; }
-.verdict > div > p + p { grid-column: 1 / -1; color: var(--text); font-size: 1.0625rem; }
-.verdict-high_risk { color: var(--red); }              /* 6.9:1 on white */
-.verdict-unable_to_verify { color: var(--warn-fg); }   /* 8.4:1 on white */
-.verdict-no_strong_indicators { color: var(--ok-fg); } /* 6.6:1 on white */
+.verdict-title { font-size: 1.35rem; margin: 0 0 0.25rem; letter-spacing: -0.01em; }
+.verdict p { margin: 0; }
+.verdict-high_risk { background: var(--risk-bg); color: var(--risk-fg); border-color: var(--red); }
+.verdict-high_risk .verdict-icon { background: var(--red); }
+.verdict-unable_to_verify { background: var(--warn-bg); color: var(--warn-fg); border-color: var(--warn-border); }
+.verdict-unable_to_verify .verdict-icon { background: var(--warn-fg); }
+.verdict-no_strong_indicators { background: var(--info-bg); color: var(--info-fg); border-color: var(--info-border); }
+.verdict-no_strong_indicators .verdict-icon { background: var(--info-fg); }
 
 /* What have you done? */
 .done { border-top: 1px solid var(--border); padding-top: var(--section-gap); }
@@ -334,7 +319,7 @@ mark {
 .btn-state:hover { border-color: var(--red); color: var(--red); }
 
 .action-card {
-  border: 1px solid; border-top-width: 4px; border-radius: var(--radius);
+  border: 1px solid; border-left-width: 6px; border-radius: var(--radius);
   padding: var(--card-pad); margin-top: var(--space-4); box-shadow: var(--shadow); background: var(--surface);
 }
 .action-card h3 { font-size: 1.25rem; }
@@ -343,7 +328,7 @@ mark {
 .urgency-low .urgency-label, .urgency-low h3 { color: var(--info-fg); }
 .urgency-medium { border-color: var(--warn-border); background: var(--warn-bg); }
 .urgency-medium .urgency-label, .urgency-medium h3 { color: var(--warn-fg); }
-.urgency-high, .urgency-critical { border-color: var(--red-tint-border); border-top-color: var(--red); background: var(--risk-bg); }
+.urgency-high, .urgency-critical { border-color: var(--red-tint-border); border-left-color: var(--red); background: var(--risk-bg); }
 .urgency-high .urgency-label, .urgency-high h3, .urgency-critical .urgency-label, .urgency-critical h3 { color: var(--risk-fg); }
 .steps { margin: 0.5rem 0 0.75rem; padding-left: 1.5rem; }
 .steps li { margin-bottom: 0.75rem; }
@@ -387,8 +372,6 @@ mark {
 
 @media (min-width: 48rem) {
   :root { --section-gap: var(--space-8); --card-pad: var(--space-6); }
-  .verdict { --verdict-size: 2rem; }
-  .message-view { padding: var(--space-6); }
   .btn-primary { width: auto; }
   .state-buttons { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
   .share { grid-template-columns: repeat(2, max-content); align-items: center; }
@@ -476,5 +459,5 @@ mark {
 }
 
 @media (forced-colors: active) {
-  .tag, .badge, .action-card { border: 1px solid CanvasText; }
+  .tag, .badge, .verdict, .action-card { border: 1px solid CanvasText; }
 }
