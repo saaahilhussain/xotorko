@@ -51,6 +51,21 @@ describe('validateAnalysis', () => {
   });
 });
 
+describe('describeError', () => {
+  test('includes status, message and network cause, and redacts the key', () => {
+    const apiErr = Object.assign(new Error('API key test-key not valid'), { name: 'ApiError', status: 400 });
+    const line = gemini.describeError(apiErr, 'test-key');
+    expect(line).toContain('status=400');
+    expect(line).toContain('ApiError');
+    expect(line).not.toContain('test-key');
+    expect(line).toContain('[REDACTED]');
+
+    const netErr = new TypeError('fetch failed', { cause: Object.assign(new Error('getaddrinfo'), { code: 'EAI_AGAIN' }) });
+    expect(gemini.describeError(netErr)).toContain('cause=EAI_AGAIN');
+    expect(gemini.describeError(new Error('timeout'))).toMatch(/^timeout after \d+ms$/);
+  });
+});
+
 describe('analyzeMessage', () => {
   test('returns validated JSON and sends the system instruction separately', async () => {
     mockGenerate.mockResolvedValue({ text: JSON.stringify(valid) });

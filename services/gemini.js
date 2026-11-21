@@ -211,14 +211,31 @@ async function analyzeMessage(maskedText) {
     if (result) cacheSet(key, result);
     return result;
   } catch (err) {
-    // Never log the key or the message; the error name/kind is enough.
     if (process.env.NODE_ENV !== 'test') {
-      console.warn(`[gemini] analysis unavailable (${err && err.message === 'timeout' ? 'timeout' : (err && err.name) || 'error'})`);
+      console.warn(`[gemini] analysis unavailable: ${describeError(err, apiKey)}`);
     }
     return null;
   } finally {
     clearTimeout(timer);
   }
+}
+
+/**
+ * One-line, log-safe description of a Gemini failure: name, HTTP status,
+ * message and the network cause code. The API key is redacted, and the
+ * message text sent for analysis is never included.
+ */
+function describeError(err, apiKey) {
+  if (!err) return 'unknown error';
+  if (err.message === 'timeout') return `timeout after ${TIMEOUT_MS}ms`;
+  const parts = [err.name || 'Error'];
+  if (err.status !== undefined) parts.push(`status=${err.status}`);
+  if (err.message) parts.push(`message=${String(err.message).replace(/\s+/g, ' ').slice(0, 300)}`);
+  const cause = err.cause;
+  if (cause && (cause.code || cause.message)) parts.push(`cause=${cause.code || ''} ${cause.message || ''}`.trim());
+  let out = parts.join(' ');
+  if (apiKey) out = out.split(apiKey).join('[REDACTED]');
+  return out;
 }
 
 function _clearCache() {
@@ -237,5 +254,6 @@ module.exports = {
   isConfigured,
   validateAnalysis,
   analyzeMessage,
+  describeError,
   _clearCache,
 };
