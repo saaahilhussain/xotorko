@@ -56,6 +56,25 @@
 
   // Status is stored as an i18n key so it follows a language switch.
   let statusKey = '';
+  // Motion: animations live in CSS under (prefers-reduced-motion: no-preference)
+  // and are keyed off .is-revealing. Replaying = remove, force a reflow, re-add;
+  // no timers, and nothing here waits on an animation.
+  function motionOK() {
+    return !window.matchMedia || window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+  }
+
+  function replayReveal(node) {
+    node.classList.remove('is-revealing');
+    void node.offsetWidth; // restart CSS animations
+    node.classList.add('is-revealing');
+  }
+
+  // Same focus target as before; the scroll is smooth only when motion is OK.
+  function focusAndScroll(node) {
+    node.focus({ preventScroll: true });
+    node.scrollIntoView({ behavior: motionOK() ? 'smooth' : 'auto', block: 'start' });
+  }
+
   function setStatus(key, loading) {
     statusKey = key;
     statusEl.textContent = key ? t(key) : '';
@@ -147,8 +166,9 @@
       renderResult(data);
       resetActionCard();
       resultEl.hidden = false;
+      replayReveal(resultEl);
       setStatus('status_done', false);
-      $('result-heading').focus();
+      focusAndScroll($('result-heading'));
     } catch (err) {
       setStatus('', false);
       showError(t('err_network'));
@@ -264,7 +284,7 @@
   function renderVerdict(r) {
     const box = $('verdict');
     clear(box);
-    box.className = `verdict verdict-${r.verdict}`;
+    box.className = `verdict reveal-step reveal-step-4 verdict-${r.verdict}`;
     const body = el('div', {}, el('p', { class: 'verdict-title' }, el('strong', {}, t(`verdict_${r.verdict}`))));
     if (r.verdict === 'no_strong_indicators') body.append(el('p', {}, t('disclaimer')));
     else body.append(el('p', {}, t(`verdict_${r.verdict}_desc`)));
@@ -306,7 +326,10 @@
       state.card = await res.json();
       renderActionCard(state.card);
       stateButtons.hidden = true;
-      if (focus) $('action-heading').focus();
+      if (focus) {
+        replayReveal(actionCardEl);
+        focusAndScroll($('action-heading'));
+      }
     } catch (err) {
       clear(actionCardEl);
       actionCardEl.append(el('p', { class: 'error' }, t('err_network')));
@@ -328,7 +351,7 @@
 
   function renderActionCard(card) {
     clear(actionCardEl);
-    actionCardEl.className = `action-card urgency-${card.urgency}`;
+    actionCardEl.className = `action-card reveal urgency-${card.urgency}`;
     const steps = el('ol', { class: 'steps' });
     for (const step of card.steps) {
       const li = el('li', {}, step.text);

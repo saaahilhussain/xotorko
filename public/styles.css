@@ -129,12 +129,14 @@ textarea {
 .btn-call { background: var(--risk-border); color: #fff; font-size: 1.1rem; }
 
 .status { margin: 0.75rem 0 0; min-height: 1.5em; color: var(--muted); }
+/* Loading: three dots before the status text (static when motion is reduced). */
 .status.is-loading::before {
-  content: ""; display: inline-block; width: 1em; height: 1em; margin-right: 0.5em; vertical-align: -0.15em;
-  border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  content: ""; display: inline-block; width: 1.6em; height: 0.5em; margin-right: 0.5em; vertical-align: 0.1em;
+  background:
+    radial-gradient(circle closest-side, var(--primary) 90%, transparent) 0 50% / 0.5em 0.5em no-repeat,
+    radial-gradient(circle closest-side, var(--primary) 90%, transparent) 50% 50% / 0.5em 0.5em no-repeat,
+    radial-gradient(circle closest-side, var(--primary) 90%, transparent) 100% 50% / 0.5em 0.5em no-repeat;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Result */
 .verdict-line {
@@ -256,6 +258,54 @@ mark {
   .channel-list { grid-template-columns: max-content 1fr; column-gap: 1rem; }
   .channel-list dt { margin-top: 0.2rem; }
   .channel-list dd { margin-top: 0.2rem; }
+}
+
+/* ------------------------------------------------------------------
+   Motion. Everything animated lives here, so reduced motion gets the
+   final state instantly. Only opacity, transform and the <mark>
+   background change: no layout shift. Animations never gate focus or
+   aria-live (content is in the DOM and focusable from the first frame).
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes xo-reveal {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes xo-mark {
+    from { background-color: transparent; }
+    to { background-color: var(--mark-bg); }
+  }
+  @keyframes xo-pulse {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 1; }
+  }
+
+  /* Reusable reveal: the element itself. */
+  .reveal.is-revealing { animation: xo-reveal 220ms ease-out both; }
+
+  /* Ordered blocks inside a revealing section: message, evidence, channel, verdict. */
+  .is-revealing .reveal-step { animation: xo-reveal 220ms ease-out both; }
+  .is-revealing .reveal-step-2 { animation-delay: 60ms; }
+  .is-revealing .reveal-step-3 { animation-delay: 120ms; }
+  .is-revealing .reveal-step-4 { animation-delay: 180ms; }
+
+  /* Stagger helper: direct children, 60 ms apart, capped after 6. */
+  .is-revealing .reveal-stagger > * { animation: xo-reveal 220ms ease-out both; }
+  .is-revealing .reveal-stagger > :nth-child(2) { animation-delay: 60ms; }
+  .is-revealing .reveal-stagger > :nth-child(3) { animation-delay: 120ms; }
+  .is-revealing .reveal-stagger > :nth-child(4) { animation-delay: 180ms; }
+  .is-revealing .reveal-stagger > :nth-child(5) { animation-delay: 240ms; }
+  .is-revealing .reveal-stagger > :nth-child(n+6) { animation-delay: 300ms; }
+
+  /* Warning signs light up one after another once the message is visible. */
+  .is-revealing .reveal-marks > mark { animation: xo-mark 200ms ease-out both; animation-delay: 160ms; }
+  .is-revealing .reveal-marks > mark:nth-of-type(2) { animation-delay: 220ms; }
+  .is-revealing .reveal-marks > mark:nth-of-type(3) { animation-delay: 280ms; }
+  .is-revealing .reveal-marks > mark:nth-of-type(4) { animation-delay: 340ms; }
+  .is-revealing .reveal-marks > mark:nth-of-type(5) { animation-delay: 400ms; }
+  .is-revealing .reveal-marks > mark:nth-of-type(n+6) { animation-delay: 460ms; }
+
+  .status.is-loading::before { animation: xo-pulse 1s ease-in-out infinite; }
 }
 
 @media (prefers-reduced-motion: reduce) {

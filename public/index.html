@@ -46,15 +46,15 @@
         <p id="status" class="status" role="status" aria-live="polite"></p>
       </section>
 
-      <section id="result" class="result" aria-labelledby="result-heading" aria-busy="false" hidden>
+      <section id="result" class="result reveal" aria-labelledby="result-heading" aria-busy="false" hidden>
         <h2 id="result-heading" tabindex="-1" data-i18n="result_heading">What we found</h2>
         <p id="verdict-line" class="verdict-line"></p>
         <div id="badges" class="badges"></div>
 
         <h3 data-i18n="your_message">Your message, with warning signs marked</h3>
-        <blockquote id="highlighted" class="message-view"></blockquote>
+        <blockquote id="highlighted" class="message-view reveal-step reveal-step-1 reveal-marks"></blockquote>
 
-        <div class="evidence">
+        <div class="evidence reveal-step reveal-step-2 reveal-stagger">
           <section class="ev-col" aria-labelledby="ev-msg-h">
             <h3 id="ev-msg-h" data-i18n="col_message">Message evidence</h3>
             <ul id="ev-message" class="ev-list"></ul>
@@ -69,12 +69,12 @@
           </section>
         </div>
 
-        <section id="channel" class="channel" aria-labelledby="channel-h" hidden>
+        <section id="channel" class="channel reveal-step reveal-step-3" aria-labelledby="channel-h" hidden>
           <h3 id="channel-h" data-i18n="cc_heading">Official channel check</h3>
           <dl id="channel-list" class="channel-list"></dl>
         </section>
 
-        <div id="verdict" class="verdict" tabindex="-1"></div>
+        <div id="verdict" class="verdict reveal-step reveal-step-4" tabindex="-1"></div>
 
         <section id="done" class="done" aria-labelledby="done-h">
           <h2 id="done-h" data-i18n="done_heading">What have you already done?</h2>
