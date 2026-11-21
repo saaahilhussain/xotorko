@@ -34,6 +34,8 @@ describe('POST /api/analyze', () => {
     });
     const res = await request(app).post('/api/analyze').send({ text }).expect(200);
     expect(res.body.verdict).toBe('high_risk');
+    expect(res.body.claimed_sender).toBe('SBI');
+    expect(res.body.source).toBe('gemini');
     expect(res.body.limited_mode).toBe(false);
     expect(res.body.evidence.message).toHaveLength(1);
     expect(res.body.evidence.behaviour).toEqual(['click_link', 'enter_credentials']);
@@ -119,7 +121,7 @@ describe('server hardening', () => {
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("script-src 'self'");
     expect(csp).not.toContain('unsafe-inline');
-    expect(res.text).toContain('<label for="message">');
+    expect(res.text).toMatch(/<label for="message"[ >]/);
     expect(res.text).not.toMatch(/<script>(?!<\/script>)|<style|style=/);
   });
 
