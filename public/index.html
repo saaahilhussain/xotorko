@@ -3,23 +3,105 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Xotorko</title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="description" content="Check a suspicious message. Know what to do next.">
+    <title>Xotorko: check a suspicious message</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/i18n.js" defer></script>
+    <script src="/lib.js" defer></script>
     <script src="/app.js" defer></script>
   </head>
   <body>
-    <main>
-      <h1>Xotorko</h1>
-      <p>Paste a suspicious message to check it for scam signs.</p>
-      <form id="analyze-form" novalidate>
-        <label for="message">Message</label>
-        <br>
-        <textarea id="message" name="text" rows="8" cols="60" maxlength="2000" required
-          aria-describedby="message-help"></textarea>
-        <p id="message-help">Up to 2000 characters. Phone numbers, codes and account numbers are masked before analysis. Nothing is stored.</p>
-        <button type="submit" id="submit">Check message</button>
-      </form>
-      <h2>Result</h2>
-      <pre id="result" role="status" aria-live="polite"></pre>
+    <a class="skip-link" href="#main" data-i18n="skip_link">Skip to main content</a>
+    <header class="site-header">
+      <div class="wrap">
+        <h1 class="brand">Xotorko <span lang="as">(সতৰ্ক)</span></h1>
+        <p class="tagline" data-i18n="tagline">Check a suspicious message. Know what to do next.</p>
+        <nav class="lang" aria-labelledby="lang-label">
+          <span id="lang-label" class="lang-label" data-i18n="lang_label">Language</span>
+          <button type="button" class="lang-btn" data-lang="en" lang="en" aria-pressed="true">EN</button>
+          <button type="button" class="lang-btn" data-lang="as" lang="as" aria-pressed="false">অসমীয়া</button>
+          <button type="button" class="lang-btn" data-lang="hi" lang="hi" aria-pressed="false">हिन्दी</button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="wrap" tabindex="-1">
+      <section aria-labelledby="input-heading" class="card">
+        <form id="analyze-form" novalidate>
+          <h2 id="input-heading" class="label-heading"><label for="message" data-i18n="input_label">Paste the message you received</label></h2>
+          <textarea id="message" name="text" rows="6" maxlength="2000" required
+            aria-describedby="message-help message-error"></textarea>
+          <p id="message-help" class="help" data-i18n="input_help">Up to 2000 characters. Phone numbers, codes and account numbers are hidden before the AI check. Nothing is stored.</p>
+          <p id="message-error" class="error" hidden></p>
+          <div class="examples" role="group" aria-labelledby="examples-label">
+            <span id="examples-label" class="examples-label" data-i18n="examples_label">Try an example:</span>
+            <button type="button" class="chip" data-example="s02" data-i18n="ex_s02">Electricity bill (Assamese)</button>
+            <button type="button" class="chip" data-example="s04" data-i18n="ex_s04">SBI KYC link</button>
+            <button type="button" class="chip" data-example="s13" data-i18n="ex_s13">UPI collect request</button>
+          </div>
+          <button type="submit" id="submit" class="btn btn-primary" data-i18n="check_btn">Check message</button>
+        </form>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="result" class="result" aria-labelledby="result-heading" aria-busy="false" hidden>
+        <h2 id="result-heading" tabindex="-1" data-i18n="result_heading">What we found</h2>
+        <div id="badges" class="badges"></div>
+
+        <h3 data-i18n="your_message">Your message, with warning signs marked</h3>
+        <blockquote id="highlighted" class="message-view"></blockquote>
+
+        <div class="evidence">
+          <section class="ev-col" aria-labelledby="ev-msg-h">
+            <h3 id="ev-msg-h" data-i18n="col_message">Message evidence</h3>
+            <ul id="ev-message" class="ev-list"></ul>
+          </section>
+          <section class="ev-col" aria-labelledby="ev-link-h">
+            <h3 id="ev-link-h" data-i18n="col_link">Link evidence</h3>
+            <ul id="ev-link" class="ev-list"></ul>
+          </section>
+          <section class="ev-col" aria-labelledby="ev-beh-h">
+            <h3 id="ev-beh-h" data-i18n="col_behaviour">What it wants you to do</h3>
+            <ul id="ev-behaviour" class="ev-list"></ul>
+          </section>
+        </div>
+
+        <section id="channel" class="channel" aria-labelledby="channel-h" hidden>
+          <h3 id="channel-h" data-i18n="cc_heading">Official channel check</h3>
+          <dl id="channel-list" class="channel-list"></dl>
+        </section>
+
+        <div id="verdict" class="verdict"></div>
+
+        <section id="done" class="done" aria-labelledby="done-h">
+          <h2 id="done-h" data-i18n="done_heading">What have you already done?</h2>
+          <div id="state-buttons" class="state-buttons">
+            <button type="button" class="btn btn-state" data-state="nothing" data-i18n="state_nothing">Nothing yet</button>
+            <button type="button" class="btn btn-state" data-state="clicked" data-i18n="state_clicked">Clicked the link</button>
+            <button type="button" class="btn btn-state" data-state="shared_otp" data-i18n="state_shared_otp">Shared OTP or password</button>
+            <button type="button" class="btn btn-state" data-state="paid" data-i18n="state_paid">Paid money</button>
+            <button type="button" class="btn btn-state" data-state="installed_app" data-i18n="state_installed_app">Installed an app</button>
+          </div>
+          <div id="action-card" class="action-card" hidden></div>
+        </section>
+
+        <div class="share">
+          <button type="button" id="copy-report" class="btn btn-secondary" data-i18n="copy_report">Copy incident report</button>
+          <a id="warn-family" class="btn btn-whatsapp" href="https://wa.me/" target="_blank" rel="noopener noreferrer"><span data-i18n="warn_family">Warn family on WhatsApp</span> <span class="visually-hidden" data-i18n="new_tab">(opens in a new tab)</span></a>
+          <details id="report-details" class="report-details">
+            <summary data-i18n="show_report">Show the report text</summary>
+            <pre id="report-text" class="report-text"></pre>
+          </details>
+          <button type="button" id="check-another" class="btn btn-link" data-i18n="check_another">Check another message</button>
+        </div>
+      </section>
+      <p id="announce" class="visually-hidden" aria-live="polite"></p>
     </main>
+
+    <footer class="site-footer">
+      <div class="wrap"><p data-i18n="footer">Xotorko never stores your message. Helpline numbers and steps come from official sources, not from AI.</p></div>
+    </footer>
   </body>
 </html>
