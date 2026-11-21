@@ -47,7 +47,7 @@ flowchart TD
 
 ## Limited mode
 
-If `GEMINI_API_KEY` is missing, or the Gemini call times out (8 s), errors, or returns JSON that fails the schema, `analyzeMessage` returns `null`. The pipeline then uses keyword pseudo-tactics and guesses the claimed sender from entity names in the text. `requested_actions` is empty in limited mode. The response sets `limited_mode: true`. The URL engine, scorer and channel compare run the same way in both modes.
+If `GEMINI_API_KEY` is missing, or the Gemini call times out (8 s), errors, or returns JSON that fails the schema, `analyzeMessage` returns `null`. The pipeline then uses keyword pseudo-tactics and guesses the claimed sender from entity names in the text. In limited mode `requested_actions` comes from `detectRequestedActions`, which looks for three asks only: `share_otp`, `make_payment`, and `call_number` (a call/contact verb within 60 characters of a phone number). The patterns are kept narrow and skip negated phrases, because the first two are "dangerous" in the scorer. The response sets `limited_mode: true`. The URL engine, scorer and channel compare run the same way in both modes.
 
 ## Data ownership
 

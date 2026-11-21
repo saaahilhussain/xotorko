@@ -70,3 +70,10 @@ test('live Gemini wins over the cache', async () => {
   const r = await analyzeText(TEXT);
   expect(r.source).toBe('gemini');
 });
+
+test('limited mode now reports requested actions from heuristics', async () => {
+  gemini.analyzeMessage.mockResolvedValue(null);
+  const r = await analyzeText('Your power will be cut tonight. Call officer 9000000011 immediately.', { demoCache: false });
+  expect(r.limited_mode).toBe(true);
+  expect(r.evidence.behaviour).toEqual(['call_number']);
+});
