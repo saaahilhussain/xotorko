@@ -51,7 +51,18 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api', apiRouter);
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Static assets: short public caching for CSS/JS (not fingerprinted, so keep it
+// modest); HTML is revalidated on every load so a deploy is visible at once.
+const STATIC_MAX_AGE_S = 60 * 60;
+app.use(
+  express.static(path.join(__dirname, 'public'), {
+    etag: true,
+    setHeaders(res, filePath) {
+      if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+      else res.setHeader('Cache-Control', `public, max-age=${STATIC_MAX_AGE_S}`);
+    },
+  }),
+);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found.' });
