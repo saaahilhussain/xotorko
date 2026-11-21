@@ -1,3 +1,5 @@
+// Many analyze calls in one file; the 10/min limit itself is tested in rateLimit.test.js.
+process.env.ANALYZE_RATE_LIMIT = '1000';
 jest.mock('../services/gemini', () => ({ ...jest.requireActual('../services/gemini'), analyzeMessage: jest.fn() }));
 
 const request = require('supertest');

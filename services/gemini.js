@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto');
 const { containsForbidden } = require('../lib/policy');
+const quota = require('./quota');
 
 const DEFAULT_MODEL = 'gemini-4-hydrogen';
 const TIMEOUT_MS = 8000; // per attempt
@@ -9,6 +10,16 @@ const BUDGET_MS = 12000; // total per analysis, across retries and fallback mode
 const RETRY_DELAY_MS = 1000;
 const RETRYABLE_STATUS = [429, 503];
 const CACHE_MAX = 200;
+const MAX_OUTPUT_TOKENS = 1024; // the JSON answer is ~200-400 tokens
+// LOW is the level the real-model eval ran with. The SDK also has MINIMAL, but it
+// is not confirmed for gemini-4-hydrogen; set GEMINI_THINKING_LEVEL=MINIMAL to try it.
+const DEFAULT_THINKING_LEVEL = 'LOW';
+const THINKING_LEVELS = ['MINIMAL', 'LOW'];
+
+function thinkingLevel() {
+  const v = String(process.env.GEMINI_THINKING_LEVEL || '').trim().toUpperCase();
+  return THINKING_LEVELS.includes(v) ? v : DEFAULT_THINKING_LEVEL;
+}
 
 const REQUESTED_ACTIONS = [
   'share_otp',
@@ -218,7 +229,8 @@ ${maskedText}
         responseMimeType: 'application/json',
         responseJsonSchema: RESPONSE_SCHEMA,
         temperature: 0.2,
-        thinkingConfig: { thinkingLevel: ThinkingLevel ? ThinkingLevel.LOW : 'LOW' },
+        maxOutputTokens: MAX_OUTPUT_TOKENS,
+        thinkingConfig: { thinkingLevel: (ThinkingLevel && ThinkingLevel[thinkingLevel()]) || thinkingLevel() },
         abortSignal: controller.signal,
       },
     });
@@ -252,6 +264,12 @@ async function analyzeMessage(maskedText) {
   for (const model of models) {
     const cached = cacheGet(cacheKey(maskedText, model));
     if (cached) return cached;
+  }
+
+  // Cost guardrail: past the daily cap, fall back to limited mode (cache hits above are free).
+  if (!quota.tryConsume()) {
+    log('warn', `analysis skipped: daily limit of ${quota.status().limit} reached`);
+    return null;
   }
 
   const deadline = Date.now() + BUDGET_MS;
@@ -323,6 +341,7 @@ module.exports = {
   BUDGET_MS,
   RETRY_DELAY_MS,
   CACHE_MAX,
+  MAX_OUTPUT_TOKENS,
   SYSTEM_INSTRUCTION,
   RESPONSE_SCHEMA,
   REQUESTED_ACTIONS,
@@ -332,6 +351,7 @@ module.exports = {
   validateAnalysis,
   analyzeMessage,
   getModels,
+  thinkingLevel,
   errorStatus,
   describeError,
   _clearCache,

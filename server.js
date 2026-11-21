@@ -43,6 +43,17 @@ app.use(
     message: { error: 'Too many requests. Please wait a minute and try again.' },
   }),
 );
+// Stricter limit on the only route that can call Gemini (cost + abuse).
+app.use(
+  '/api/analyze',
+  rateLimit({
+    windowMs: 60 * 1000,
+    limit: () => Number.parseInt(process.env.ANALYZE_RATE_LIMIT, 10) || 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: 'Too many checks. Please wait a minute and try again.' },
+  }),
+);
 app.use('/api', express.json({ limit: '10kb' }));
 
 app.get('/api/health', (req, res) => {
