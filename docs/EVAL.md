@@ -1,6 +1,6 @@
 # Evaluation
 
-Last run: 2026-11-21. Mode: Limited mode (no `GEMINI_API_KEY`): keyword heuristics + URL engine only.
+Last run: 2026-11-21. Mode: Gemini (`gemini-4-hydrogen`).
 
 ## Method
 
@@ -14,51 +14,52 @@ Last run: 2026-11-21. Mode: Limited mode (no `GEMINI_API_KEY`): keyword heuristi
 
 | | Predicted high_risk | Predicted not high_risk |
 |---|---|---|
-| **Scam (15)** | TP = 15 | FN = 0 |
-| **Genuine (15)** | FP = 0 | TN = 15 |
+| **Scam (15)** | TP = 14 | FN = 1 |
+| **Genuine (15)** | FP = 1 | TN = 14 |
 
-Precision 1.00, recall 1.00, accuracy 1.00.
-
-> **Read with caution:** this run used limited mode only, and the limited-mode keywords were written while looking at this dataset. The score shows the deterministic rules are consistent with the labels; it is not evidence of accuracy on unseen messages. Re-run with `GEMINI_API_KEY` set for the real pipeline.
+Precision 0.93, recall 0.93, accuracy 0.93.
 
 ## Failures
 
-None in this run.
+| id | label | verdict | category | top contributors |
+|---|---|---|---|---|
+| s11 | scam | unable_to_verify | job | Asks you to call or message a number; Asks you to open a link; Promise of reward: "Earn Rs 3000-8000 daily" |
+| g12 | genuine | high_risk | telecom | Asks you to send money (sender not verified) |
 
 ## All items
 
 | id | label | lang | category | verdict | outcome | mode |
 |---|---|---|---|---|---|---|
-| s01 | scam | en | electricity | high_risk | TP | limited |
-| s02 | scam | as | electricity | high_risk | TP | limited |
-| s03 | scam | as-latn | electricity | high_risk | TP | limited |
-| s04 | scam | en | bank_kyc | high_risk | TP | limited |
-| s05 | scam | hi-latn | bank_kyc | high_risk | TP | limited |
-| s06 | scam | en | parcel | high_risk | TP | limited |
-| s07 | scam | en | apk | high_risk | TP | limited |
-| s08 | scam | en | lottery | high_risk | TP | limited |
-| s09 | scam | en | digital_arrest | high_risk | TP | limited |
-| s10 | scam | en | telecom | high_risk | TP | limited |
-| s11 | scam | en | job | high_risk | TP | limited |
-| s12 | scam | en | refund | high_risk | TP | limited |
-| s13 | scam | en | upi_collect | high_risk | TP | limited |
-| s14 | scam | as | family_impersonation | high_risk | TP | limited |
-| s15 | scam | en | otp_request | high_risk | TP | limited |
-| g01 | genuine | en | otp | no_strong_indicators | TN | limited |
-| g02 | genuine | en | debit_alert | no_strong_indicators | TN | limited |
-| g03 | genuine | en | electricity | no_strong_indicators | TN | limited |
-| g04 | genuine | en | credit_alert | no_strong_indicators | TN | limited |
-| g05 | genuine | en | parcel | no_strong_indicators | TN | limited |
-| g06 | genuine | en | aadhaar | no_strong_indicators | TN | limited |
-| g07 | genuine | en | delivery | no_strong_indicators | TN | limited |
-| g08 | genuine | as | family | no_strong_indicators | TN | limited |
-| g09 | genuine | en | railway | no_strong_indicators | TN | limited |
-| g10 | genuine | en | otp | no_strong_indicators | TN | limited |
-| g11 | genuine | hi-latn | personal | no_strong_indicators | TN | limited |
-| g12 | genuine | en | telecom | no_strong_indicators | TN | limited |
-| g13 | genuine | en | bank_info | no_strong_indicators | TN | limited |
-| g14 | genuine | en | epfo | no_strong_indicators | TN | limited |
-| g15 | genuine | en | appointment | no_strong_indicators | TN | limited |
+| s01 | scam | en | electricity | high_risk | TP | gemini |
+| s02 | scam | as | electricity | high_risk | TP | gemini |
+| s03 | scam | as-latn | electricity | high_risk | TP | gemini |
+| s04 | scam | en | bank_kyc | high_risk | TP | gemini |
+| s05 | scam | hi-latn | bank_kyc | high_risk | TP | gemini |
+| s06 | scam | en | parcel | high_risk | TP | gemini |
+| s07 | scam | en | apk | high_risk | TP | gemini |
+| s08 | scam | en | lottery | high_risk | TP | gemini |
+| s09 | scam | en | digital_arrest | high_risk | TP | gemini |
+| s10 | scam | en | telecom | high_risk | TP | gemini |
+| s11 | scam | en | job | unable_to_verify | FN | gemini |
+| s12 | scam | en | refund | high_risk | TP | gemini |
+| s13 | scam | en | upi_collect | high_risk | TP | gemini |
+| s14 | scam | as | family_impersonation | high_risk | TP | gemini |
+| s15 | scam | en | otp_request | high_risk | TP | gemini |
+| g01 | genuine | en | otp | no_strong_indicators | TN | gemini |
+| g02 | genuine | en | debit_alert | no_strong_indicators | TN | gemini |
+| g03 | genuine | en | electricity | no_strong_indicators | TN | gemini |
+| g04 | genuine | en | credit_alert | no_strong_indicators | TN | gemini |
+| g05 | genuine | en | parcel | no_strong_indicators | TN | gemini |
+| g06 | genuine | en | aadhaar | no_strong_indicators | TN | gemini |
+| g07 | genuine | en | delivery | no_strong_indicators | TN | gemini |
+| g08 | genuine | as | family | no_strong_indicators | TN | gemini |
+| g09 | genuine | en | railway | no_strong_indicators | TN | gemini |
+| g10 | genuine | en | otp | no_strong_indicators | TN | gemini |
+| g11 | genuine | hi-latn | personal | no_strong_indicators | TN | gemini |
+| g12 | genuine | en | telecom | high_risk | FP | gemini |
+| g13 | genuine | en | bank_info | no_strong_indicators | TN | gemini |
+| g14 | genuine | en | epfo | no_strong_indicators | TN | gemini |
+| g15 | genuine | en | appointment | no_strong_indicators | TN | gemini |
 
 ## Honest limitations
 

@@ -1,1 +1,85 @@
-{}
+{
+  "s01": {
+    "recorded_on": "2026-11-21",
+    "masked_text": "Dear Consumer, your electricity power will be disconnected tonight at 9:30 PM because your previous month bill was not updated. Please immediately contact our electricity officer [PHONE]. Thank you.",
+    "analysis": {
+      "claimed_sender": null,
+      "requested_actions": [
+        "call_number"
+      ],
+      "language": "en",
+      "is_conversational_personal": false,
+      "tactics": [
+        {
+          "type": "threat",
+          "exact_span": "your electricity power will be disconnected tonight at 9:30 PM",
+          "explanation": "It threatens to cut off an essential utility service if the reader does not act."
+        },
+        {
+          "type": "urgency",
+          "exact_span": "immediately",
+          "explanation": "It pressures the reader to respond right away without verifying the claim."
+        },
+        {
+          "type": "authority",
+          "exact_span": "electricity officer",
+          "explanation": "It invokes an official-sounding role to make the demand seem legitimate."
+        }
+      ]
+    }
+  },
+  "s02": {
+    "recorded_on": "2026-11-21",
+    "masked_text": "প্ৰিয় গ্ৰাহক, আপোনাৰ বিদ্যুৎ সংযোগ আজি নিশা ৯:৩০ বজাত বিচ্ছিন্ন কৰা হ'ব। বিল আপডেট নাই। লগে লগে এই নম্বৰত যোগাযোগ কৰক [PHONE]",
+    "analysis": {
+      "claimed_sender": null,
+      "requested_actions": [
+        "call_number"
+      ],
+      "language": "as",
+      "is_conversational_personal": false,
+      "tactics": [
+        {
+          "type": "threat",
+          "exact_span": "বিদ্যুৎ সংযোগ আজি নিশা ৯:৩০ বজাত বিচ্ছিন্ন কৰা হ'ব",
+          "explanation": "Threatens immediate disconnection of the electricity supply tonight."
+        },
+        {
+          "type": "urgency",
+          "exact_span": "লগে লগে",
+          "explanation": "Pressures the recipient to act immediately without verifying."
+        }
+      ]
+    }
+  },
+  "s07": {
+    "recorded_on": "2026-11-21",
+    "masked_text": "Your electricity bill payment failed. Download APDCL Bill Update app to avoid disconnection: http://bill-update-apdcl.site/APDCL_Update.apk",
+    "analysis": {
+      "claimed_sender": "APDCL",
+      "requested_actions": [
+        "install_app",
+        "click_link"
+      ],
+      "language": "en",
+      "is_conversational_personal": false,
+      "tactics": [
+        {
+          "type": "threat",
+          "exact_span": "to avoid disconnection",
+          "explanation": "Threatens electricity disconnection to pressure the reader into acting."
+        },
+        {
+          "type": "lookalike_link",
+          "exact_span": "http://bill-update-apdcl.site/APDCL_Update.apk",
+          "explanation": "Uses a non-official domain mimicking APDCL to distribute an APK file."
+        },
+        {
+          "type": "authority",
+          "exact_span": "APDCL",
+          "explanation": "Claims to be from the official electricity utility company."
+        }
+      ]
+    }
+  }
+}
