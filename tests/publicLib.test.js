@@ -149,3 +149,24 @@ describe('i18n', () => {
     for (const [id, text] of Object.entries(L.EXAMPLES)) expect(items.find((i) => i.id === id).text).toBe(text);
   });
 });
+
+describe('groupLinksByDomain', () => {
+  test('one group per host, warnings ordered by severity, duplicates removed', () => {
+    const groups = L.groupLinksByDomain([
+      { url: 'https://sbi-kyc.top/a', host: 'sbi-kyc.top', signals: [{ type: 'suspicious_tld', reason: 'tld' }, { type: 'lookalike', reason: 'look' }] },
+      { url: 'https://SBI-KYC.top/b', host: 'SBI-KYC.top', signals: [{ type: 'lookalike', reason: 'look' }] },
+      { url: 'https://sbi.bank.in', host: 'sbi.bank.in', signals: [{ type: 'official_match', reason: 'official' }] },
+      { url: 'https://example.org', host: 'example.org', signals: [] },
+    ]);
+    expect(groups.map((g) => g.host)).toEqual(['sbi-kyc.top', 'sbi.bank.in', 'example.org']);
+    expect(groups[0].urls).toHaveLength(2);
+    expect(groups[0].signals.map((s) => s.type)).toEqual(['lookalike', 'suspicious_tld']);
+    expect(groups[1].signals.map((s) => s.type)).toEqual(['official_match']);
+    expect(groups[2].signals).toEqual([]);
+  });
+
+  test('tolerates bad input', () => {
+    expect(L.groupLinksByDomain(undefined)).toEqual([]);
+    expect(L.groupLinksByDomain([null, {}])).toEqual([]);
+  });
+});

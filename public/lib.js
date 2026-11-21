@@ -68,6 +68,41 @@
     return out;
   }
 
+  /**
+   * Group link evidence by domain: one entry per host, warnings first (by
+   * severity), then informational signals; duplicate reasons removed.
+   * @returns {{ host: string, urls: string[], signals: {type, reason}[] }[]}
+   */
+  function groupLinksByDomain(links) {
+    const groups = new Map();
+    for (const l of Array.isArray(links) ? links : []) {
+      if (!l) continue;
+      const host = String(l.host || l.url || '').toLowerCase();
+      if (!host) continue;
+      if (!groups.has(host)) groups.set(host, { host, urls: [], signals: [], seen: new Set() });
+      const g = groups.get(host);
+      if (l.url && !g.urls.includes(l.url)) g.urls.push(l.url);
+      for (const s of l.signals || []) {
+        const key = `${s.type}|${s.reason}`;
+        if (g.seen.has(key)) continue;
+        g.seen.add(key);
+        g.signals.push({ type: s.type, reason: s.reason });
+      }
+    }
+    const rank = (type) => {
+      const i = LINK_WARNINGS.indexOf(type);
+      return i === -1 ? LINK_WARNINGS.length : i;
+    };
+    return [...groups.values()].map(({ host, urls, signals }) => ({
+      host,
+      urls,
+      signals: signals
+        .map((s, i) => ({ s, i }))
+        .sort((a, b) => rank(a.s.type) - rank(b.s.type) || a.i - b.i)
+        .map(({ s }) => s),
+    }));
+  }
+
   /** Unique URLs from the link evidence. */
   function linksOf(result) {
     const links = (result && result.evidence && Array.isArray(result.evidence.link)) ? result.evidence.link : [];
@@ -174,6 +209,7 @@
     LINK_WARNINGS,
     defang,
     highlightSegments,
+    groupLinksByDomain,
     linksOf,
     topReasons,
     claimedOf,

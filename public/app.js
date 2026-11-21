@@ -161,6 +161,7 @@
 
   // ---------------------------------------------------------------- result
   function renderResult(r) {
+    renderVerdictLine(r);
     renderBadges(r);
     renderHighlighted(r);
     renderMessageEvidence(r);
@@ -169,6 +170,18 @@
     renderChannel(r);
     renderVerdict(r);
     updateShare();
+  }
+
+  function renderVerdictLine(r) {
+    const box = $('verdict-line');
+    clear(box);
+    box.className = `verdict-line verdict-line-${r.verdict}`;
+    box.append(
+      el('span', { class: 'verdict-line-icon', 'aria-hidden': 'true' }, VERDICT_ICON[r.verdict] || '!'),
+      el('strong', {}, t(`verdict_${r.verdict}`)),
+      ' · ',
+      el('a', { href: '#verdict', 'data-do': 'see-why' }, t('see_why')),
+    );
   }
 
   function renderBadges(r) {
@@ -206,14 +219,15 @@
   }
 
   function renderLinkEvidence(r) {
-    const items = [];
-    for (const link of r.evidence.link) {
-      const warnings = (link.signals || []).filter((s) => L.LINK_WARNINGS.includes(s.type));
-      const info = (link.signals || []).filter((s) => !L.LINK_WARNINGS.includes(s.type));
-      const host = el('span', { class: 'ev-host' }, L.defang(link.host || link.url));
-      if (!warnings.length && !info.length) items.push(el('li', {}, host, ' — ', t('link_clean')));
-      for (const s of [...warnings, ...info]) items.push(el('li', {}, host.cloneNode(true), ' — ', s.reason));
-    }
+    // One block per domain: the (defanged) domain as a heading, reasons below.
+    const items = L.groupLinksByDomain(r.evidence.link).map((g) => {
+      const reasons = g.signals.length
+        ? g.signals.map((sig) => el('li', { class: L.LINK_WARNINGS.includes(sig.type) ? 'ev-warn' : 'ev-info' }, sig.reason))
+        : [el('li', { class: 'empty' }, t('link_clean'))];
+      return el('li', { class: 'ev-domain' },
+        el('h4', { class: 'ev-host' }, L.defang(g.host)),
+        el('ul', { class: 'ev-reasons' }, reasons));
+    });
     list('ev-link', items, t('link_none'));
   }
 
@@ -255,6 +269,15 @@
     else body.append(el('p', {}, t(`verdict_${r.verdict}_desc`)));
     box.append(el('span', { class: 'verdict-icon', 'aria-hidden': 'true' }, VERDICT_ICON[r.verdict] || '!'), body);
   }
+
+  $('verdict-line').addEventListener('click', (e) => {
+    if (!e.target.closest('[data-do="see-why"]')) return;
+    e.preventDefault();
+    const banner = $('verdict');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    banner.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+    banner.focus({ preventScroll: true });
+  });
 
   // ---------------------------------------------------------------- actions
   function resetActionCard() {
