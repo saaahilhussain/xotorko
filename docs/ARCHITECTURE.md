@@ -4,12 +4,12 @@ Xotorko is a single Express app. Gemini reads the manipulation in a message. Det
 
 ```mermaid
 flowchart TD
-    U[User pastes message] --> API[POST /api/analyze<br/>10 kb body limit, 30 req/min/IP]
+    U[User pastes message] --> API[POST /api/analyze<br/>10 kb body limit, 10 req/min/IP]
     API --> S[lib/sanitize.js<br/>trim, max 2000 chars, reject empty]
     S --> M[mask: phone, OTP, account/card, email<br/>URLs kept intact]
     S --> X[extractUrls: http/s, bare domains,<br/>shorteners, wa.me]
 
-    M --> G[services/gemini.js<br/>system instruction + JSON schema<br/>8 s timeout, LRU cache]
+    M --> G[services/gemini.js<br/>system instruction + JSON schema<br/>8 s/attempt, 12 s budget, retry + fallback models<br/>daily cap, LRU cache, demo cache on failure]
     G -->|valid JSON, spans verified| T[tactics, requested_actions,<br/>claimed_sender]
     G -->|timeout / error / invalid| L[Limited mode<br/>lib/heuristics.js keyword fallback]
     L --> T
