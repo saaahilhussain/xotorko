@@ -1,0 +1,189 @@
+{
+  "_meta": {
+    "purpose": "Verified official channels for Official Channel Compare. Code-owned; Gemini never edits this.",
+    "checked_on": "2026-11-21",
+    "status_legend": {
+      "verified": "Confirmed against an official or primary source on checked_on",
+      "verify": "Widely known but not re-checked today. Open the domain once before demo."
+    },
+    "reserved_suffixes": {
+      ".bank.in": "Exclusive to RBI-regulated banks (RBI circular RBI/2025-26/28, migration deadline 31 Oct 2025)",
+      ".gov.in": "Reserved for Government of India / state government bodies",
+      ".nic.in": "Government sites hosted by NIC"
+    }
+  },
+  "entities": [
+    {
+      "id": "sbi",
+      "name": "State Bank of India",
+      "aliases": ["SBI", "State Bank", "SBI Bank", "YONO", "YONO SBI"],
+      "type": "bank",
+      "official_domains": ["sbi.bank.in", "sbi.co.in", "onlinesbi.sbi"],
+      "helpline": null,
+      "helpline_note": "Use the number on the back of your card or inside the official YONO app.",
+      "status": "verified",
+      "source": "PIB Fact Check via Free Press Journal; RBI .bank.in circular"
+    },
+    {
+      "id": "hdfc",
+      "name": "HDFC Bank",
+      "aliases": ["HDFC", "HDFC Bank"],
+      "type": "bank",
+      "official_domains": ["hdfc.bank.in", "hdfcbank.com"],
+      "helpline": null,
+      "helpline_note": "Use the number on the back of your card or inside the official app.",
+      "status": "verified",
+      "source": "Upstox: hdfcbank.com redirects to hdfc.bank.in"
+    },
+    {
+      "id": "icici",
+      "name": "ICICI Bank",
+      "aliases": ["ICICI", "ICICI Bank", "iMobile"],
+      "type": "bank",
+      "official_domains": ["icici.bank.in", "icicibank.com"],
+      "helpline": null,
+      "helpline_note": "Use the number on the back of your card or inside the official app.",
+      "status": "verified",
+      "source": "PIB Fact Check via Free Press Journal"
+    },
+    {
+      "id": "axis",
+      "name": "Axis Bank",
+      "aliases": ["Axis", "Axis Bank"],
+      "type": "bank",
+      "official_domains": ["axis.bank.in", "axisbank.com"],
+      "helpline": null,
+      "helpline_note": "Use the number on the back of your card or inside the official app.",
+      "status": "verified",
+      "source": "PIB Fact Check via Free Press Journal"
+    },
+    {
+      "id": "pnb",
+      "name": "Punjab National Bank",
+      "aliases": ["PNB", "Punjab National Bank"],
+      "type": "bank",
+      "official_domains": ["pnb.bank.in", "pnbindia.in"],
+      "helpline": null,
+      "helpline_note": "Use the number on the back of your card or inside the official app.",
+      "status": "verified",
+      "source": "PIB Fact Check via Free Press Journal"
+    },
+    {
+      "id": "kotak",
+      "name": "Kotak Mahindra Bank",
+      "aliases": ["Kotak", "Kotak Bank", "Kotak Mahindra"],
+      "type": "bank",
+      "official_domains": ["kotak.bank.in", "kotak.com"],
+      "helpline": null,
+      "helpline_note": "Use the number on the back of your card or inside the official app.",
+      "status": "verified",
+      "source": "PIB Fact Check via Free Press Journal"
+    },
+    {
+      "id": "apdcl",
+      "name": "Assam Power Distribution Company Ltd",
+      "aliases": ["APDCL", "Assam electricity", "Bijulee", "myBijulee", "electricity department", "বিদ্যুৎ বিভাগ", "bidyut"],
+      "type": "utility",
+      "official_domains": ["apdcl.org"],
+      "official_sms_sender_id": "DAPDCL",
+      "helpline": "1912",
+      "helpline_note": "APDCL says genuine SMS come only from sender ID DAPDCL. It does not send disconnection alerts from personal 10-digit numbers.",
+      "status": "verified",
+      "source": "India Today NE (APDCL advisory, May 2024); Assam Power Dept site (1912); district site email @apdcl.org"
+    },
+    {
+      "id": "uidai",
+      "name": "UIDAI (Aadhaar)",
+      "aliases": ["Aadhaar", "Aadhar", "UIDAI", "mAadhaar"],
+      "type": "government",
+      "official_domains": ["uidai.gov.in", "myaadhaar.uidai.gov.in"],
+      "helpline": "1947",
+      "status": "verify",
+      "source": "Known official domain; re-check helpline before demo"
+    },
+    {
+      "id": "indiapost",
+      "name": "India Post",
+      "aliases": ["India Post", "Speed Post", "post office", "IPPB"],
+      "type": "government",
+      "official_domains": ["indiapost.gov.in", "ippbonline.com"],
+      "helpline": null,
+      "status": "verify",
+      "source": "Known official domains; India Post parcel scams are common"
+    },
+    {
+      "id": "incometax",
+      "name": "Income Tax Department",
+      "aliases": ["Income Tax", "IT department", "ITR refund", "tax refund"],
+      "type": "government",
+      "official_domains": ["incometax.gov.in"],
+      "helpline": null,
+      "status": "verify",
+      "source": "Known official domain"
+    },
+    {
+      "id": "epfo",
+      "name": "EPFO",
+      "aliases": ["EPFO", "PF", "provident fund", "UAN"],
+      "type": "government",
+      "official_domains": ["epfindia.gov.in", "unifiedportal-mem.epfindia.gov.in"],
+      "helpline": null,
+      "status": "verify",
+      "source": "Known official domain"
+    },
+    {
+      "id": "npci",
+      "name": "NPCI / UPI",
+      "aliases": ["NPCI", "UPI", "BHIM"],
+      "type": "payments",
+      "official_domains": ["npci.org.in", "bhimupi.org.in"],
+      "helpline": null,
+      "status": "verify",
+      "source": "Known official domains"
+    },
+    {
+      "id": "trai_dot",
+      "name": "TRAI / Department of Telecommunications",
+      "aliases": ["TRAI", "DoT", "telecom department", "your SIM will be blocked"],
+      "type": "government",
+      "official_domains": ["trai.gov.in", "dot.gov.in", "sancharsaathi.gov.in"],
+      "helpline": null,
+      "helpline_note": "DoT/TRAI say they do not authorise anyone to call threatening disconnection of mobile numbers.",
+      "status": "verified",
+      "source": "Sanchar Saathi advisory on threatening fake disconnection calls"
+    },
+    {
+      "id": "cybercrime",
+      "name": "National Cyber Crime Reporting Portal",
+      "aliases": ["cyber crime", "cyber police", "I4C", "1930"],
+      "type": "government",
+      "official_domains": ["cybercrime.gov.in", "i4c.mha.gov.in"],
+      "helpline": "1930",
+      "status": "verified",
+      "source": "MHA; Wikipedia NCRP (official site cybercrime.gov.in, helpline 1930)"
+    },
+    {
+      "id": "assam_police",
+      "name": "Assam Police",
+      "aliases": ["Assam Police", "police", "CID Assam", "digital arrest"],
+      "type": "government",
+      "official_domains": ["police.assam.gov.in"],
+      "helpline": "112",
+      "helpline_note": "Police never 'digitally arrest' anyone over video call or ask for money transfers.",
+      "status": "verify",
+      "source": "Known; 112 is the national emergency number"
+    },
+    {
+      "id": "irctc",
+      "name": "IRCTC / Indian Railways",
+      "aliases": ["IRCTC", "railway", "train ticket refund"],
+      "type": "government",
+      "official_domains": ["irctc.co.in", "indianrail.gov.in"],
+      "helpline": null,
+      "status": "verify",
+      "source": "Known official domains"
+    }
+  ],
+  "url_shorteners": ["bit.ly", "tinyurl.com", "t.co", "goo.gl", "is.gd", "cutt.ly", "rb.gy", "shorturl.at", "tiny.cc", "ow.ly", "rebrand.ly", "t.ly", "s.id"],
+  "suspicious_tlds": [".xyz", ".top", ".click", ".link", ".live", ".shop", ".buzz", ".icu", ".online", ".site", ".rest", ".cfd", ".sbs", ".monster", ".zip", ".mov"]
+}

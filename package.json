@@ -1,0 +1,21 @@
+{
+  "name": "xotorko",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Xotorko hackathon project skeleton",
+  "main": "server.js",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.3.2"
+  }
+}

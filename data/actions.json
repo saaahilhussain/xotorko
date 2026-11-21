@@ -1,0 +1,108 @@
+{
+  "_meta": {
+    "purpose": "Vetted action cards for the 'What have you already done?' router. Code-owned; Gemini never writes advice or numbers.",
+    "checked_on": "2026-11-21",
+    "channels": {
+      "1930": {
+        "label": "National Cyber Crime Helpline",
+        "tel": "1930",
+        "use_for": "Money already lost via UPI, card, bank transfer or wallet. Call first: fast reporting can help hold funds still in the recipient account.",
+        "source": "MHA I4C; Sanchar Saathi fraud-loan-apps advisory"
+      },
+      "cybercrime_portal": {
+        "label": "National Cyber Crime Reporting Portal",
+        "url": "https://cybercrime.gov.in",
+        "use_for": "Formal complaint for any cyber crime, including after a 1930 call (use the acknowledgement number).",
+        "source": "MHA; Sanchar Saathi advisory"
+      },
+      "chakshu": {
+        "label": "Chakshu on Sanchar Saathi",
+        "url": "https://sancharsaathi.gov.in/sfc/",
+        "use_for": "Reporting a suspected fraud call, SMS or WhatsApp message when no money has been lost. For communication received within the last 30 days.",
+        "not_for": "If money is already lost, use 1930 / cybercrime.gov.in instead.",
+        "source": "DoT Sanchar Saathi; HDFC Bank reporting guide"
+      },
+      "bank": {
+        "label": "Your bank",
+        "use_for": "Block card / UPI / net banking and report the unauthorised transaction.",
+        "how": "Use the number printed on your card or inside the bank's official app. Never use a number from the suspicious message.",
+        "note": "RBI tells customers to report unauthorised transactions as early as possible; the longer you wait, the higher the risk of loss.",
+        "source": "RBI Customer Protection circular (RBI/2017-18/15)"
+      },
+      "emergency_112": {
+        "label": "Emergency",
+        "tel": "112",
+        "use_for": "Threats to your safety, extortion, or someone claiming to be police and demanding money ('digital arrest')."
+      }
+    }
+  },
+  "states": {
+    "nothing": {
+      "label": { "en": "Nothing yet", "hi": "अभी कुछ नहीं किया", "as": "এতিয়ালৈকে একো কৰা নাই" },
+      "urgency": "low",
+      "headline": { "en": "Good. You're safe for now. Don't engage.", "hi": "अच्छा। जवाब न दें।", "as": "ভাল। উত্তৰ নিদিব।" },
+      "steps": [
+        { "en": "Do not click the link, call the number, or reply." },
+        { "en": "If you're unsure, contact the organisation yourself using its official website or app, not anything in this message." },
+        { "en": "Report the message on Chakshu (Sanchar Saathi). This helps block the sender." , "channel": "chakshu" },
+        { "en": "Block the sender and delete the message." },
+        { "en": "Warn your family: share the warning card." , "action": "share_warning" }
+      ]
+    },
+    "clicked": {
+      "label": { "en": "I clicked the link", "hi": "मैंने लिंक खोला", "as": "মই লিংকটো খুলিছিলোঁ" },
+      "urgency": "medium",
+      "headline": { "en": "Close the page now. Don't enter anything.", "hi": "पेज तुरंत बंद करें।", "as": "পেজটো লগে লগে বন্ধ কৰক।" },
+      "steps": [
+        { "en": "Close the page. Do not enter any details, OTP, PIN or password." },
+        { "en": "If anything downloaded, do not open or install it. Delete it." },
+        { "en": "Did you type any details on that page? If yes, choose 'I shared OTP / password' instead.", "action": "goto:shared_otp" },
+        { "en": "Watch your bank SMS alerts for the next few days." },
+        { "en": "Report the message on Chakshu.", "channel": "chakshu" }
+      ]
+    },
+    "shared_otp": {
+      "label": { "en": "I shared OTP / password / card details", "hi": "मैंने OTP / पासवर्ड बताया", "as": "মই OTP / পাছৱৰ্ড দিছিলোঁ" },
+      "urgency": "high",
+      "headline": { "en": "Act now: block your account access before money moves.", "hi": "तुरंत अपना खाता/कार्ड ब्लॉक करवाएँ।", "as": "লগে লগে একাউণ্ট/কাৰ্ড ব্লক কৰক।" },
+      "steps": [
+        { "en": "Call your bank now and block your card, UPI and net banking. Use the number on your card or in the official app.", "channel": "bank" },
+        { "en": "From a trusted device, change your net banking, UPI PIN and email passwords." },
+        { "en": "If any money has already left your account, call 1930 immediately.", "channel": "1930" },
+        { "en": "Keep screenshots of the message and any transaction SMS." },
+        { "en": "Do not share any more codes, even if someone calls claiming to 'reverse' the transaction." }
+      ]
+    },
+    "paid": {
+      "label": { "en": "I made a payment", "hi": "मैंने पैसे भेज दिए", "as": "মই পইচা পঠিয়াই দিছোঁ" },
+      "urgency": "critical",
+      "headline": { "en": "Call 1930 now. Speed matters.", "hi": "अभी 1930 पर कॉल करें।", "as": "এতিয়াই 1930 ত ফোন কৰক।" },
+      "steps": [
+        { "en": "Call 1930 right now. Fast reporting can help hold money that is still in the scammer's account.", "channel": "1930" },
+        { "en": "Call your bank and report the unauthorised transaction. Use the number on your card or in the official app.", "channel": "bank" },
+        { "en": "Note the transaction ID / UTR, amount, time, and the UPI ID or account you paid. Screenshot everything." , "action": "copy_report" },
+        { "en": "File a complaint on cybercrime.gov.in using the acknowledgement number from your 1930 call.", "channel": "cybercrime_portal" },
+        { "en": "Stop all contact with the sender. Ignore anyone offering to 'recover' your money for a fee: that is a second scam." }
+      ]
+    },
+    "installed_app": {
+      "label": { "en": "I installed an app / APK", "hi": "मैंने ऐप इंस्टॉल किया", "as": "মই এপ ইনষ্টল কৰিছোঁ" },
+      "urgency": "critical",
+      "headline": { "en": "Disconnect this phone now. It may be controlled remotely.", "hi": "फ़ोन का इंटरनेट तुरंत बंद करें।", "as": "ফোনৰ ইণ্টাৰনেট লগে লগে বন্ধ কৰক।" },
+      "steps": [
+        { "en": "Turn off mobile data and Wi-Fi on this phone now." },
+        { "en": "Uninstall the app. If it won't uninstall, don't open any banking app on this phone." },
+        { "en": "From a different phone, call your bank and block card, UPI and net banking.", "channel": "bank" },
+        { "en": "If any money has left your account, call 1930 immediately.", "channel": "1930" },
+        { "en": "After backing up photos, consider a factory reset before using banking apps on this phone again." }
+      ]
+    }
+  },
+  "sender_specific_notes": {
+    "apdcl": { "en": "APDCL sends genuine SMS only from sender ID DAPDCL. For bill or connection issues call 1912 or use the myBijulee app." },
+    "trai_dot": { "en": "DoT/TRAI do not authorise anyone to call threatening to disconnect your mobile number." },
+    "assam_police": { "en": "Police never 'digitally arrest' anyone over video call or ask you to transfer money. Call 112." }
+  },
+  "never_say": ["safe", "100%", "guaranteed", "genuine for sure"],
+  "low_signal_disclaimer": { "en": "No strong scam indicators detected. This does not guarantee the message is genuine. Verify using the organisation's official website, app or number." }
+}
