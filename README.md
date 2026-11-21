@@ -34,7 +34,8 @@ message → sanitize → mask PII → Gemini (or rules in limited mode) ┐
 npm ci
 cp .env.example .env          # add GEMINI_API_KEY; without it the app runs in limited mode
 npm start                     # http://localhost:8080
-npm test                      # 181 tests
+npm test                      # 183 tests
+npm run lint                  # ESLint
 npm run test:coverage         # coverage report
 npm run eval                  # real-model eval → docs/EVAL.md (uses API credits)
 ```
@@ -59,10 +60,10 @@ Real model, 30 hand-labelled messages (15 scam, 15 genuine; English, Assamese sc
 
 | Criterion | Where |
 |---|---|
-| **Code Quality** | Small pure modules with one job each: `lib/sanitize.js`, `lib/urlCheck.js`, `lib/scorer.js`, `lib/channelCompare.js`, `lib/actions.js`, orchestrated by `lib/analyze.js`, which the API and `scripts/eval.js` share. Code-owned data lives in `data/*.json`. The frontend splits pure helpers (`public/lib.js`, `public/i18n.js`) from DOM code (`public/app.js`). Decisions are recorded in `docs/DECISIONS.md`. |
-| **Security** | PII masked before Gemini (`lib/sanitize.js`). Strict CSP and helmet; no inline code; DOM built only with `textContent`. Links are never fetched and always shown defanged. Rate limits of 10/min for analyze and 30/min for the rest of the API. Body limit 10 kb, nothing stored. The scorer, not the model, sets the verdict (prompt-injection resistant). `npm audit` is clean and no secrets are in git history. See [SECURITY.md](SECURITY.md), including the threat model. |
-| **Efficiency** | One Gemini call per message, with `maxOutputTokens` 1024 and LOW thinking. In-memory LRU cache. Daily cap `GEMINI_DAILY_LIMIT` (`services/quota.js`). 12 s budget, then retry and fallback (`services/gemini.js`). Page is about 70 KB with no fonts or CDNs, gzip, and content-hash asset URLs with one-day caching (`server.js`). Lighthouse performance is 100. |
-| **Testing** | 181 Jest tests in 16 files: scorer, URL engine, heuristics in 3 languages, the retry/fallback/budget/cap paths, rate limits, CSP and landmarks, translation integrity (facts unchanged, Assamese ৰ/ৱ, never "safe"), and defang/report/warning builders. Coverage is 96% of statements. The real-model eval is `scripts/eval.js`. |
+| **Code Quality** | Small pure modules with one job each: `lib/sanitize.js`, `lib/urlCheck.js`, `lib/scorer.js`, `lib/channelCompare.js`, `lib/actions.js`, orchestrated by `lib/analyze.js`, which the API and `scripts/eval.js` share. Code-owned data lives in `data/*.json`. The frontend splits pure helpers (`public/lib.js`, `public/i18n.js`) from DOM code (`public/app.js`). Decisions are recorded in `docs/DECISIONS.md`. ESLint flat config (`eslint.config.js`, `npm run lint`), and GitHub Actions CI (`.github/workflows/ci.yml`) runs lint and tests on every push and pull request to `main`. |
+| **Security** | PII masked before Gemini (`lib/sanitize.js`). Strict CSP and helmet; no inline code; DOM built only with `textContent`. Links are never fetched and always shown defanged. Rate limits of 10/min for analyze and 30/min for the rest of the API. Body limit 10 kb, nothing stored. The scorer, not the model, sets the verdict (prompt-injection resistant). `npm audit` is clean and no secrets are in git history. The Gemini key is stored in Google Secret Manager and injected with `--set-secrets` (`docs/PROMPTS.md`). See [SECURITY.md](SECURITY.md), including the threat model. |
+| **Efficiency** | One Gemini call per message, with `maxOutputTokens` 1024 and LOW thinking. In-memory LRU cache. Daily cap `GEMINI_DAILY_LIMIT` (`services/quota.js`). 12 s budget, then retry and fallback (`services/gemini.js`). Page is about 70 KB with no fonts or CDNs, gzip, and content-hash asset URLs with one-day caching (`server.js`). Lighthouse performance is 100. Cloud Run `--min-instances 1` avoids cold starts, and `--max-instances 2` bounds cost. |
+| **Testing** | 183 Jest tests in 16 files: scorer, URL engine, heuristics in 3 languages, the retry/fallback/budget/cap paths, rate limits, CSP and landmarks, translation integrity (facts unchanged, Assamese ৰ/ৱ, never "safe"), and defang/report/warning builders. Coverage is 96% of statements. The real-model eval is `scripts/eval.js`. |
 | **Accessibility** | WCAG 2.1 AA. Semantic landmarks, skip link and labelled controls. Status in aria-live; focus moves to the result and then the action card. Labels are text, not colour alone; contrast is at least 6.2:1. `lang` follows the language toggle; reduced motion is respected; tap targets are at least 44 px. **Lighthouse accessibility 100** (mobile and desktop) and **axe-core: 0 violations** in 24 scans (3 languages × 4 UI states × 375/1280 px). Method below. |
 | **Problem Statement Alignment** | PS01 scam detection, extended to what victims need next: evidence highlighted in the message, an official-channel comparison (`data/genuine.json`), a verdict, then "What have you already done?" → vetted steps (1930 vs Chakshu vs bank), a copyable incident report and a defanged WhatsApp warning for family. Assamese-first for Assam, plus Hindi and English. |
 
@@ -76,7 +77,6 @@ Real model, 30 hand-labelled messages (15 scam, 15 genuine; English, Assamese sc
 - **Translations:** the Assamese and Hindi text has not yet been reviewed by native speakers. Server-written explanations are in English.
 - **Per-instance counters:** the daily cap and rate limits are counted in memory per instance and reset on restart.
 - **Text only:** no screenshots, voice calls or forwarded-chain parsing.
-- **Cold start:** with `--min-instances 0`, the first request after an idle period takes about 10 s; warm requests take about 1 s. `--min-instances 1` removes the delay at a small fixed cost.
 - **No guarantees:** "No strong scam signs found" always comes with a disclaimer. Xotorko never says a message is safe.
 
 Demo script: [docs/DEMO.md](docs/DEMO.md). Security: [SECURITY.md](SECURITY.md).

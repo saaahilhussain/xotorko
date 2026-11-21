@@ -65,6 +65,8 @@ describe('detectRequestedActions (limited mode)', () => {
       ['negated', 'Never call [PHONE] or reply to this message'],
       ['number but no call verb', 'PNR 4521367890 Train 15959 CNF'],
       ['verb far from the number', `Call us any time. ${'x'.repeat(80)} Ref 9876543210`],
+      ['the verb is only part of a word', 'Product recall notice. Ref [PHONE]'],
+      ['the verb is only part of a word (prefix)', 'Free upcall offer [PHONE]'],
     ])('not when %s', (_, text) => {
       expect(asks(text)).not.toContain('call_number');
     });

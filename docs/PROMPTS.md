@@ -41,7 +41,8 @@ Steps:
    git push
 9. Run `git branch -a` and confirm only main exists (local and remote). Run `git count-objects -vH` and confirm the size is far under 10 MB.
 10. Print (do not run) the deploy command I will run myself:
-   gcloud run deploy xotorko --source . --region asia-south1 --allow-unauthenticated --max-instances 2 --min-instances 0 --set-env-vars GEMINI_MODEL=gemini-4-hydrogen,GEMINI_API_KEY=<key>
+   gcloud run deploy xotorko --source . --region asia-south1 --allow-unauthenticated --max-instances 2 --min-instances 1 --set-env-vars GEMINI_MODEL=gemini-4-hydrogen --set-secrets GEMINI_API_KEY=gemini-api-key:latest
+   (One-time setup: `printf %s "$KEY" | gcloud secrets create gemini-api-key --data-file=-`, then grant the Cloud Run service account `roles/secretmanager.secretAccessor` on that secret.)
 
 Report: what you created, test output, branch list, repo size. Then stop and wait for my next instruction.
 ```

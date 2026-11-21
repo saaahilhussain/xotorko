@@ -33,7 +33,7 @@ Xotorko never tells a user a message is safe. Verdicts are `high_risk`, `unable_
 
 ## Secrets
 
-- `GEMINI_API_KEY` is read only from the environment (`.env` locally via dotenv, which is git-ignored; Cloud Run env vars in production). It is never logged or returned.
+- `GEMINI_API_KEY` is read only from the environment (`.env` locally via dotenv, which is git-ignored; Google Secret Manager via `--set-secrets` in production). It is never logged or returned.
 - `.env.example` contains placeholders only.
 
 ## Review (2026-11-21)
@@ -41,7 +41,7 @@ Xotorko never tells a user a message is safe. Verdicts are `high_risk`, `unable_
 - `npm audit`: 0 vulnerabilities (all dependencies, and production only).
 - Secret scan of the working tree **and full git history** (`git log --all -p`) for `AIza…`, `AQ.…` and `GEMINI_API_KEY=<value>`: no matches apart from placeholders (`your-key-here`, `<key>`). `.env` has never been committed, and only `.env.example` is tracked.
 - Checked: helmet + CSP (also covered by tests), rate limits (tested), body limit (tested), no message storage (server code never writes files; the in-memory LRU holds analyses only).
-- Recommendation for production: move `GEMINI_API_KEY` from a plain Cloud Run env var to Secret Manager (`--set-secrets`).
+- In production, `GEMINI_API_KEY` is stored in Google Secret Manager (`gemini-api-key`) and injected with `--set-secrets`, never as a plain env var (see the deploy command in `docs/PROMPTS.md`).
 
 ## Threat model
 

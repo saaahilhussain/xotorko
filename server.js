@@ -102,7 +102,6 @@ app.use((req, res) => {
 });
 
 // Central error handler: safe messages only, never stack traces or message text.
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   if (err && err.type === 'entity.too.large') {
     return res.status(413).json({ error: 'Message is too large.' });

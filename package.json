@@ -17,7 +17,8 @@
     "start": "node server.js",
     "test": "jest",
     "test:coverage": "jest --coverage --collectCoverageFrom=lib/**/*.js --collectCoverageFrom=services/**/*.js --collectCoverageFrom=routes/**/*.js --collectCoverageFrom=server.js --collectCoverageFrom=public/lib.js --collectCoverageFrom=public/i18n.js",
-    "eval": "node scripts/eval.js"
+    "eval": "node scripts/eval.js",
+    "lint": "eslint ."
   },
   "dependencies": {
     "@google/genai": "^3.6.1",
@@ -28,6 +29,9 @@
     "helmet": "^8.3.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
     "jest": "^29.7.0",
     "supertest": "^7.3.2"
   }
