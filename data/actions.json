@@ -40,7 +40,7 @@
     "nothing": {
       "label": { "en": "Nothing yet", "hi": "अभी कुछ नहीं किया", "as": "এতিয়ালৈকে একো কৰা নাই" },
       "urgency": "low",
-      "headline": { "en": "Good. You're safe for now. Don't engage.", "hi": "अच्छा। जवाब न दें।", "as": "ভাল। উত্তৰ নিদিব।" },
+      "headline": { "en": "Good. Don't engage with it.", "hi": "अच्छा। जवाब न दें।", "as": "ভাল। উত্তৰ নিদিব।" },
       "steps": [
         { "en": "Do not click the link, call the number, or reply." },
         { "en": "If you're unsure, contact the organisation yourself using its official website or app, not anything in this message." },

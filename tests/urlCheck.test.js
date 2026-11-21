@@ -52,6 +52,17 @@ describe('urlCheck', () => {
     expect(types(checkUrl('https://indiapost-redelivery.live/track'))).toContain('lookalike');
   });
 
+  test('brand as a whole domain token is a lookalike', () => {
+    expect(types(checkUrl('https://sbi-kyc-verify.top/login'))).toContain('lookalike');
+    expect(types(checkUrl('apdcl-billupdate.in'))).toContain('lookalike');
+    expect(types(checkUrl('http://hdfc24.xyz'))).toContain('lookalike'); // digits split tokens
+  });
+
+  test('brand only as a substring is not a lookalike', () => {
+    expect(types(checkUrl('taxis.com'))).not.toContain('lookalike');
+    expect(types(checkUrl('https://www.sbitech-news.com'))).not.toContain('lookalike');
+  });
+
   test('unrelated domain gets no lookalike signal', () => {
     expect(types(checkUrl('https://www.wikipedia.org/'))).toEqual([]);
   });
