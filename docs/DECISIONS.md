@@ -26,3 +26,13 @@ Gemini resilience and a demo cache, after `gemini-4-hydrogen` returned 503 (over
 - **Demo cache (demo resilience, not a feature).** `data/demo_cache.json` can hold pre-recorded Gemini analyses for eval items s01, s02 and s07, recorded with a real call by `node scripts/record-demo-cache.js`. It is used only when live Gemini fails *and* the masked text matches a cached item exactly. The response then has `limited_mode: false` and `"source": "cache"`, so it is never passed off as a live call. Cached analyses are re-validated on load (schema plus exact-span grounding), and the URL engine, scorer, channel compare and advice still run live in code.
 - **Why:** a live demo should not depend on a preview model's capacity at that minute. The cache covers only the scripted demo messages, and only the AI part, which is already the one probabilistic component.
 - **Honesty limits:** the eval (`npm run eval`) bypasses the cache (`analyzeText(text, { demoCache: false })`), so reported numbers are never helped by recorded answers. Any other message gets the normal path: live Gemini, or clearly labelled limited mode.
+
+## Entry #4
+
+Action cards and UI strings are translated into Assamese and Hindi; native speakers still need to review them.
+
+- `data/actions.json` now has `as` and `hi` for every headline and step, the sender-specific notes and the low-signal disclaimer. Only the wording was added. Facts, numbers (1930, 1912, 112), URLs and channel IDs are unchanged, and a test checks that every number and domain in each translation matches the English.
+- Assamese uses ৰ (U+09F0) and ৱ (U+09F1), not Bengali র/ব. A test fails on any Bengali র in Assamese strings.
+- "Official" (an organisation's own site or app) is written অফিচিয়েল in Assamese and आधिकारिक in Hindi. চৰকাৰী and सरकारी ("government") are kept for government bodies only.
+- The never-"safe" rule also covers translations: tests reject सुरक्षित, সুৰক্ষিত and নিৰাপদ.
+- **Needs review:** the translations were written by the developer with AI help, not by a professional translator. A native Assamese speaker and a native Hindi speaker should review them before real users see them, especially the urgent cards (`paid`, `shared_otp`, `installed_app`). Until then, English is always one tap away in the language bar.

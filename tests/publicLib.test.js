@@ -138,6 +138,11 @@ describe('i18n', () => {
     }
   });
 
+  test('Assamese UI strings use ৰ (U+09F0), never Bengali র (U+09B0)', () => {
+    const bad = Object.entries(I18N.STRINGS.as).filter(([, v]) => v.includes('র')).map(([k]) => k);
+    expect(bad).toEqual([]);
+  });
+
   test('examples match the eval fixtures', () => {
     const fixtures = require('./fixtures/eval.json');
     const items = Array.isArray(fixtures) ? fixtures : fixtures.items;

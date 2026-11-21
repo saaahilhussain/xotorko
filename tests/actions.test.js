@@ -21,10 +21,29 @@ describe('actions', () => {
     expect(card.steps.some((s) => s.channel && s.channel.url === 'https://cybercrime.gov.in')).toBe(true);
   });
 
-  test('uses translations when present and falls back to English for steps', () => {
+  test('returns Assamese headline and steps, keeping numbers and channels', () => {
     const card = getActionCard('paid', 'as');
-    expect(card.headline).toBe('এতিয়াই 1930 ত ফোন কৰক।');
-    expect(card.steps[0].text).toMatch(/1930/); // step has only English
+    expect(card.headline).toMatch(/^এতিয়াই 1930 ত ফোন কৰক।/);
+    expect(card.steps[0].text).toMatch(/1930/);
+    expect(card.steps[0].text).not.toMatch(/[A-Za-z]{4,}/); // translated, not English
+    expect(card.steps[0].channel.tel).toBe('1930');
+  });
+
+  test('returns Hindi steps', () => {
+    const card = getActionCard('installed_app', 'hi');
+    expect(card.steps.every((s) => /[ऀ-ॿ]/.test(s.text))).toBe(true);
+  });
+
+  test('falls back to English when a translation is missing', () => {
+    const data = require('../data/actions.json');
+    const step = data.states.nothing.steps[0];
+    const saved = step.as;
+    delete step.as;
+    try {
+      expect(getActionCard('nothing', 'as').steps[0].text).toBe(step.en);
+    } finally {
+      step.as = saved;
+    }
   });
 
   test('unknown state or language is rejected', () => {
