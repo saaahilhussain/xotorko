@@ -77,3 +77,11 @@ Precision 0.93, recall 0.93, accuracy 0.93.
 - s14 (family impersonation, Assamese) has no link and no organisation: pure social engineering. **This run: high_risk (TP).**
 - g02 contains a VPA and 'Not you? Call': genuine but superficially similar to scams; tests false positives. **This run: no_strong_indicators (TN).**
 - g13 mentions OTP/PIN/password but as a warning: tests that keywords alone don't trigger high_risk. **This run: no_strong_indicators (TN).**
+
+## Why s11 and g12 were missed (hand-written; keep when regenerating)
+
+These two are documented as known limitations. The scoring logic was deliberately **not** changed to fit them, because tuning rules to 30 messages would overfit.
+
+- **s11, a job/task scam, got `unable_to_verify` (FN).** Gemini correctly found one reward tactic ("Earn Rs 3000-8000 daily") and asks to open a link and message on WhatsApp. In `lib/scorer.js` those asks are *weak* signals, and a single tactic is also weak, so the result is `unable_to_verify`. Task scams ask for money only later in the chat, so the first message has no "dangerous" ask (OTP, payment, app install). The user still sees "Couldn't verify" with the evidence, not a clean result.
+- **g12, a genuine Jio recharge reminder, got `high_risk` (FP).** Gemini read "Recharge via MyJio app" as `make_payment`. The message has no link, so the channel compare can't verify the sender, and the scorer treats a payment request from an unverified sender as high risk. We accept this: over-warning on a bill costs less than missing a "pay now" scam.
+- **Changes since this run:** `maxOutputTokens` 1024 was added, and limited mode now detects `call_number`, `share_otp` and `make_payment`. The Gemini-path scoring is unchanged. This report was not regenerated, to save API credits.
