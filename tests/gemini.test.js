@@ -24,9 +24,16 @@ beforeEach(() => {
   gemini._clearCache();
 });
 
+afterEach(() => {
+  delete process.env.GEMINI_FALLBACK_MODELS;
+  jest.useRealTimers();
+});
+
 afterAll(() => {
   delete process.env.GEMINI_API_KEY;
 });
+
+const apiError = (status) => Object.assign(new Error(`got status ${status}`), { name: 'ApiError', status });
 
 describe('validateAnalysis', () => {
   test('drops tactics whose exact_span is not in the input', () => {
@@ -102,5 +109,48 @@ describe('analyzeMessage', () => {
     await jest.advanceTimersByTimeAsync(gemini.TIMEOUT_MS + 1);
     expect(await p).toBeNull();
     jest.useRealTimers();
+  });
+
+  test('retries a 503 once after 1s, then falls back to the next model', async () => {
+    jest.useFakeTimers();
+    process.env.GEMINI_FALLBACK_MODELS = ' fallback-a , fallback-b ';
+    const primary = gemini.getModels()[0];
+    mockGenerate
+      .mockRejectedValueOnce(apiError(503))
+      .mockRejectedValueOnce(apiError(503))
+      .mockRejectedValueOnce(apiError(429))
+      .mockResolvedValueOnce({ text: JSON.stringify(valid) });
+    const p = gemini.analyzeMessage(TEXT);
+    await jest.advanceTimersByTimeAsync(gemini.RETRY_DELAY_MS * 3);
+    const r = await p;
+    expect(r.claimed_sender).toBe('SBI');
+    expect(mockGenerate.mock.calls.map((c) => c[0].model)).toEqual([primary, primary, 'fallback-a', 'fallback-a']);
+  });
+
+  test('does not retry or fall back on non-retryable errors', async () => {
+    process.env.GEMINI_FALLBACK_MODELS = 'fallback-a';
+    mockGenerate.mockRejectedValue(apiError(400));
+    expect(await gemini.analyzeMessage(TEXT)).toBeNull();
+    expect(mockGenerate).toHaveBeenCalledTimes(1);
+  });
+
+  test('returns null once the 12s total budget is used up', async () => {
+    jest.useFakeTimers();
+    process.env.GEMINI_FALLBACK_MODELS = 'fallback-a,fallback-b,fallback-c';
+    mockGenerate.mockReturnValue(new Promise(() => {})); // every model hangs
+    const p = gemini.analyzeMessage(TEXT);
+    await jest.advanceTimersByTimeAsync(gemini.BUDGET_MS + 100);
+    expect(await p).toBeNull();
+    // 8s on the primary, the remaining 4s on fallback-a; fallback-b/c never called.
+    expect(mockGenerate.mock.calls.map((c) => c[0].model)).toEqual([gemini.getModels()[0], 'fallback-a']);
+  });
+
+  test('model list: GEMINI_MODEL first, fallbacks deduplicated', () => {
+    const prev = process.env.GEMINI_MODEL;
+    process.env.GEMINI_MODEL = 'm1';
+    process.env.GEMINI_FALLBACK_MODELS = 'm2,,m1, m3';
+    expect(gemini.getModels()).toEqual(['m1', 'm2', 'm3']);
+    if (prev === undefined) delete process.env.GEMINI_MODEL;
+    else process.env.GEMINI_MODEL = prev;
   });
 });

@@ -25,7 +25,7 @@ async function main() {
   for (const [i, item] of fixtures.items.entries()) {
     if (useGemini && i > 0) await sleep(DELAY_MS);
     const started = Date.now();
-    const r = await analyzeText(item.text);
+    const r = await analyzeText(item.text, { demoCache: false }); // never score pre-recorded answers
     const predictedScam = r.verdict === 'high_risk';
     const isScam = item.label === 'scam';
     const outcome = isScam ? (predictedScam ? 'TP' : 'FN') : predictedScam ? 'FP' : 'TN';

@@ -1,4 +1,4 @@
-jest.mock('../services/gemini', () => ({ analyzeMessage: jest.fn() }));
+jest.mock('../services/gemini', () => ({ ...jest.requireActual('../services/gemini'), analyzeMessage: jest.fn() }));
 
 const request = require('supertest');
 const gemini = require('../services/gemini');

@@ -4,7 +4,10 @@ const crypto = require('node:crypto');
 const { containsForbidden } = require('../lib/policy');
 
 const DEFAULT_MODEL = 'gemini-4-hydrogen';
-const TIMEOUT_MS = 8000;
+const TIMEOUT_MS = 8000; // per attempt
+const BUDGET_MS = 12000; // total per analysis, across retries and fallback models
+const RETRY_DELAY_MS = 1000;
+const RETRYABLE_STATUS = [429, 503];
 const CACHE_MAX = 200;
 
 const REQUESTED_ACTIONS = [
@@ -168,33 +171,48 @@ function isConfigured() {
 }
 
 /**
- * Analyse a masked message with Gemini.
- * @returns {Promise<object|null>} validated analysis, or null on any failure
- *          (missing key, timeout, API error, invalid JSON / schema).
+ * Ordered model list: GEMINI_MODEL (primary, default DEFAULT_MODEL) followed by
+ * the comma-separated GEMINI_FALLBACK_MODELS. Duplicates and blanks removed.
  */
-async function analyzeMessage(maskedText) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || !isStr(maskedText) || maskedText.length === 0) return null;
-  const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
+function getModels() {
+  const primary = (process.env.GEMINI_MODEL || '').trim() || DEFAULT_MODEL;
+  const fallbacks = (process.env.GEMINI_FALLBACK_MODELS || '').split(',').map((m) => m.trim()).filter(Boolean);
+  return [...new Set([primary, ...fallbacks])];
+}
 
-  const key = cacheKey(maskedText, model);
-  const cached = cacheGet(key);
-  if (cached) return cached;
+/** HTTP status of an SDK error, if any (ApiError.status, or a code in the message). */
+function errorStatus(err) {
+  if (!err) return undefined;
+  if (Number.isInteger(err.status)) return err.status;
+  const m = /(429|503)|RESOURCE_EXHAUSTED|UNAVAILABLE/.exec(String(err.message || ''));
+  if (!m) return undefined;
+  if (m[1]) return Number(m[1]);
+  return m[0] === 'RESOURCE_EXHAUSTED' ? 429 : 503;
+}
 
+function isRetryable(err) {
+  return RETRYABLE_STATUS.includes(errorStatus(err));
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** One generateContent call with its own timeout. Resolves to the response text. */
+async function callModel(apiKey, model, maskedText, timeoutMs) {
   const controller = new AbortController();
   let timer;
   const timeout = new Promise((_, reject) => {
     timer = setTimeout(() => {
       controller.abort();
       reject(new Error('timeout'));
-    }, TIMEOUT_MS);
+    }, timeoutMs);
   });
-
   try {
     const { ThinkingLevel } = require('@google/genai');
     const request = getClient(apiKey).models.generateContent({
       model,
-      contents: [{ role: 'user', parts: [{ text: `<message>\n${maskedText}\n</message>` }] }],
+      contents: [{ role: 'user', parts: [{ text: `<message>
+${maskedText}
+</message>` }] }],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: 'application/json',
@@ -205,19 +223,76 @@ async function analyzeMessage(maskedText) {
       },
     });
     const response = await Promise.race([request, timeout]);
-    const text = response && typeof response.text === 'string' ? response.text : null;
-    if (!text) return null;
-    const result = validateAnalysis(JSON.parse(text), maskedText);
-    if (result) cacheSet(key, result);
-    return result;
-  } catch (err) {
-    if (process.env.NODE_ENV !== 'test') {
-      console.warn(`[gemini] analysis unavailable: ${describeError(err, apiKey)}`);
-    }
-    return null;
+    return response && typeof response.text === 'string' ? response.text : null;
   } finally {
     clearTimeout(timer);
   }
+}
+
+const log = (level, msg) => {
+  if (process.env.NODE_ENV !== 'test') console[level](`[gemini] ${msg}`);
+};
+
+/**
+ * Analyse a masked message with Gemini.
+ *
+ * Resilience: models are tried in getModels() order. A 503/429 is retried once
+ * after RETRY_DELAY_MS, then the next model is tried; a timeout moves straight
+ * to the next model. Everything shares a BUDGET_MS total budget. Other errors
+ * (auth, bad request) and invalid JSON stop immediately.
+ *
+ * @returns {Promise<object|null>} validated analysis, or null on any failure
+ *          (missing key, budget exhausted, API error, invalid JSON / schema).
+ */
+async function analyzeMessage(maskedText) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || !isStr(maskedText) || maskedText.length === 0) return null;
+  const models = getModels();
+
+  for (const model of models) {
+    const cached = cacheGet(cacheKey(maskedText, model));
+    if (cached) return cached;
+  }
+
+  const deadline = Date.now() + BUDGET_MS;
+  const remaining = () => deadline - Date.now();
+
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      if (remaining() <= 0) {
+        log('warn', `analysis unavailable: time budget of ${BUDGET_MS}ms used up`);
+        return null;
+      }
+      try {
+        const text = await callModel(apiKey, model, maskedText, Math.min(TIMEOUT_MS, remaining()));
+        if (!text) {
+          log('warn', `analysis unavailable: empty response from ${model}`);
+          return null;
+        }
+        const result = validateAnalysis(JSON.parse(text), maskedText);
+        if (!result) {
+          log('warn', `analysis unavailable: ${model} returned JSON that failed validation`);
+          return null;
+        }
+        cacheSet(cacheKey(maskedText, model), result);
+        log('info', `answered by ${model}${attempt ? ' (after retry)' : ''}`);
+        return result;
+      } catch (err) {
+        log('warn', `${model} attempt ${attempt + 1} failed: ${describeError(err, apiKey)}`);
+        if (isRetryable(err)) {
+          if (attempt === 0 && remaining() > RETRY_DELAY_MS) {
+            await sleep(RETRY_DELAY_MS);
+            continue; // retry same model once
+          }
+          break; // next model
+        }
+        if (err && err.message === 'timeout') break; // next model
+        return null; // auth / bad request / parse errors won't improve on another model
+      }
+    }
+  }
+  log('warn', 'analysis unavailable: all models failed');
+  return null;
 }
 
 /**
@@ -245,6 +320,8 @@ function _clearCache() {
 module.exports = {
   DEFAULT_MODEL,
   TIMEOUT_MS,
+  BUDGET_MS,
+  RETRY_DELAY_MS,
   CACHE_MAX,
   SYSTEM_INSTRUCTION,
   RESPONSE_SCHEMA,
@@ -254,6 +331,8 @@ module.exports = {
   isConfigured,
   validateAnalysis,
   analyzeMessage,
+  getModels,
+  errorStatus,
   describeError,
   _clearCache,
 };
