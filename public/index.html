@@ -47,6 +47,13 @@
         <p id="status" class="status" role="status" aria-live="polite"></p>
       </section>
 
+      <div id="result-region" class="expander">
+        <div class="expander-inner">
+          <div id="result-skeleton" class="card skeleton" aria-hidden="true" hidden>
+            <div class="sk-block sk-line"></div>
+            <div class="sk-block sk-medium"></div>
+            <div class="sk-block sk-tall"></div>
+          </div>
       <section id="result" class="result reveal" aria-labelledby="result-heading" aria-busy="false" hidden>
         <h2 id="result-heading" tabindex="-1" data-i18n="result_heading">What we found</h2>
         <p id="verdict-line" class="verdict-line"></p>
@@ -86,7 +93,11 @@
             <button type="button" class="btn btn-state" data-state="paid" data-i18n="state_paid">Paid money</button>
             <button type="button" class="btn btn-state" data-state="installed_app" data-i18n="state_installed_app">Installed an app</button>
           </div>
-          <div id="action-card" class="action-card" hidden></div>
+          <div id="action-region" class="expander">
+            <div class="expander-inner">
+              <div id="action-card" class="action-card" hidden></div>
+            </div>
+          </div>
         </section>
 
         <div class="share">
@@ -99,6 +110,8 @@
           <button type="button" id="check-another" class="btn btn-link" data-i18n="check_another">Check another message</button>
         </div>
       </section>
+        </div>
+      </div>
       <p id="announce" class="visually-hidden" aria-live="polite"></p>
     </main>
 

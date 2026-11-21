@@ -16,6 +16,10 @@
   const announceEl = $('announce');
   const actionCardEl = $('action-card');
   const stateButtons = $('state-buttons');
+  const mainEl = $('main');
+  const resultRegion = $('result-region');
+  const resultSkeleton = $('result-skeleton');
+  const actionRegion = $('action-region');
 
   const state = {
     lang: 'en',
@@ -143,6 +147,10 @@
     submit.disabled = true;
     form.setAttribute('aria-busy', 'true');
     resultEl.setAttribute('aria-busy', 'true');
+    if (resultEl.hidden) {
+      resultSkeleton.hidden = false;
+      resultRegion.classList.add('is-open');
+    }
     setStatus('status_checking', true);
     try {
       const res = await fetch('/api/analyze', {
@@ -165,6 +173,8 @@
       state.card = null;
       renderResult(data);
       resetActionCard();
+      resultSkeleton.hidden = true;
+      mainEl.classList.add('has-results');
       resultEl.hidden = false;
       replayReveal(resultEl);
       setStatus('status_done', false);
@@ -176,6 +186,8 @@
       submit.disabled = false;
       form.setAttribute('aria-busy', 'false');
       resultEl.setAttribute('aria-busy', 'false');
+      resultSkeleton.hidden = true;
+      if (resultEl.hidden) resultRegion.classList.remove('is-open');
     }
   });
 
@@ -304,6 +316,7 @@
   function resetActionCard() {
     clear(actionCardEl);
     actionCardEl.hidden = true;
+    actionRegion.classList.remove('is-open');
     stateButtons.hidden = false;
   }
 
@@ -316,9 +329,10 @@
     state.choice = choice;
     updateShare();
     actionCardEl.hidden = false;
+    actionRegion.classList.add('is-open');
     actionCardEl.setAttribute('aria-busy', 'true');
     clear(actionCardEl);
-    actionCardEl.className = 'action-card';
+    actionCardEl.className = 'action-card is-loading';
     actionCardEl.append(el('p', {}, t('loading_card')));
     try {
       const res = await fetch(`/api/actions/${encodeURIComponent(choice)}?lang=${encodeURIComponent(state.lang)}`);
@@ -332,6 +346,7 @@
       }
     } catch (err) {
       clear(actionCardEl);
+      actionCardEl.classList.remove('is-loading');
       actionCardEl.append(el('p', { class: 'error' }, t('err_network')));
     } finally {
       actionCardEl.setAttribute('aria-busy', 'false');
@@ -435,6 +450,8 @@
     state.choice = null;
     state.card = null;
     resultEl.hidden = true;
+    resultRegion.classList.remove('is-open');
+    mainEl.classList.remove('has-results');
     resetActionCard();
     setStatus('', false);
     textarea.value = '';

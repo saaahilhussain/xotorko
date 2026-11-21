@@ -37,6 +37,15 @@
   --ok-fg: #1d6b32;       /* 6.3:1 on white */
   --wa: #0b6e4f;          /* white text: 6.5:1 */
 
+  /* Spacing scale */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --section-gap: var(--space-6);
+  --card-pad: var(--space-4);
+
   --radius: 12px;
   --radius-btn: 10px;
   --shadow: 0 1px 2px rgba(28, 27, 26, 0.06), 0 8px 24px rgba(28, 27, 26, 0.06);
@@ -51,6 +60,8 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
+  display: flex; flex-direction: column;
+  min-height: 100vh; min-height: 100dvh;
   background: var(--bg);
   color: var(--text);
   font-family: "Noto Sans Bengali", "Noto Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
@@ -58,7 +69,7 @@ body {
   line-height: 1.55;
 }
 
-.wrap { width: 100%; max-width: 60rem; margin: 0 auto; padding: 0 1rem; }
+.wrap { width: 100%; max-width: calc(760px + 2 * var(--space-4)); margin: 0 auto; padding: 0 var(--space-4); }
 
 h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 0.5rem; letter-spacing: -0.01em; }
 h2 { font-size: 1.3rem; }
@@ -75,6 +86,12 @@ a:hover { color: var(--red-dark); }
 }
 [tabindex="-1"]:focus { outline: none; }
 [tabindex="-1"]:focus-visible { outline: 3px solid var(--focus); }
+h2[tabindex="-1"]:focus:not(:focus-visible), h3[tabindex="-1"]:focus:not(:focus-visible) { outline: none; }
+/* Smooth-scroll targets: the focused heading is scrolled so that its CARD's
+   top edge lands 16px below the viewport top (card padding, plus the urgency
+   label above the action-card heading). */
+#result-heading { scroll-margin-top: calc(var(--space-4) + var(--card-pad)); }
+#action-heading { scroll-margin-top: calc(var(--space-4) + var(--card-pad) + 1.9rem); }
 
 .visually-hidden {
   position: absolute !important;
@@ -128,14 +145,20 @@ a:hover { color: var(--red-dark); }
 .lang-btn:hover { border-color: var(--red); color: var(--red); }
 .lang-btn[aria-pressed="true"] { background: var(--red); border-color: var(--red); color: #fff; }
 
-main { padding-top: 1.25rem; padding-bottom: 2rem; }
+main {
+  flex: 1 0 auto;
+  display: flex; flex-direction: column;
+  padding-top: clamp(24px, 6vh, 64px); padding-bottom: clamp(24px, 6vh, 64px);
+}
+/* Before the first result, the input card sits in the middle of the free space. */
+main:not(.has-results) { justify-content: center; }
 main:focus { outline: none; }
 
 /* Cards */
 .card, .result {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); box-shadow: var(--shadow);
-  padding: 1.25rem; margin-bottom: 1.25rem;
+  padding: var(--card-pad); margin: 0;
 }
 
 /* Input */
@@ -186,10 +209,18 @@ textarea:focus { border-color: var(--red); }
     radial-gradient(circle closest-side, var(--red) 90%, transparent) 100% 50% / 0.5em 0.5em no-repeat;
 }
 
-/* Result */
+/* Result: vertical rhythm. Sections are --section-gap apart; the compact
+   verdict and badge row sit --space-3 under the heading and each other. */
+.result > * { margin-top: 0; margin-bottom: 0; }
+.result > * + * { margin-top: var(--section-gap); }
+.result > #verdict-line,
+.result > #badges,
+.result > h3 + .message-view { margin-top: var(--space-3); }
+.badges:empty { display: none; }
+
 .verdict-line {
   display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem;
-  margin: 0 0 0.75rem; padding: 0.45rem 0.7rem; border-radius: var(--radius-btn);
+  padding: 0.45rem 0.7rem; border-radius: var(--radius-btn);
   border: 1px solid; border-left-width: 5px;
 }
 .verdict-line a { color: inherit; font-weight: 600; }
@@ -208,7 +239,7 @@ textarea:focus { border-color: var(--red); }
 .ev-reasons { margin: 0; padding-left: 1.1rem; }
 .ev-reasons li { padding: 0.15rem 0; border: 0; }
 .ev-reasons .ev-info { color: var(--muted); }
-.badges { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+.badges { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 .badge {
   display: inline-block; font-size: 0.9rem; font-weight: 600;
   padding: 0.2rem 0.6rem; border-radius: 999px;
@@ -216,7 +247,7 @@ textarea:focus { border-color: var(--red); }
 }
 
 .message-view {
-  margin: 0 0 1rem; padding: 0.85rem 1rem;
+  margin-inline: 0; padding: var(--space-3) var(--space-4);
   background: var(--bg); border-left: 4px solid var(--border-strong); border-radius: 8px;
   white-space: pre-wrap; overflow-wrap: anywhere;
 }
@@ -232,18 +263,19 @@ mark {
   vertical-align: 0.1em;
 }
 
-.evidence { display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+.evidence { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
 .ev-col, .channel {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem;
+  border-radius: var(--radius); box-shadow: var(--shadow); padding: var(--card-pad);
 }
+.ev-col h3, .channel h3, .done h2 { margin-bottom: var(--space-3); }
 .ev-list { list-style: none; margin: 0; padding: 0; }
-.ev-list li { padding: 0.4rem 0; border-top: 1px solid var(--border); overflow-wrap: anywhere; }
-.ev-list li:first-child { border-top: 0; }
+.ev-list > li { padding: var(--space-3) 0; border-top: 1px solid var(--border); overflow-wrap: anywhere; }
+.ev-list > li:first-child { border-top: 0; padding-top: 0; }
+.ev-list > li:last-child { padding-bottom: 0; }
 .ev-list .empty { color: var(--muted); }
 .ev-host { font-family: ui-monospace, Consolas, monospace; font-size: 0.92em; }
 
-.channel { margin-bottom: 1rem; }
 .channel-list { display: grid; grid-template-columns: 1fr; margin: 0; }
 .channel-list dt { font-weight: 600; color: var(--muted); font-size: 0.92rem; margin-top: 0.4rem; }
 .channel-list dd { margin: 0; overflow-wrap: anywhere; }
@@ -253,7 +285,7 @@ mark {
 .verdict {
   display: flex; gap: 0.75rem; align-items: flex-start;
   border: 1px solid; border-left-width: 6px; border-radius: var(--radius);
-  padding: 1rem 1.1rem; margin-bottom: 1.25rem;
+  padding: var(--space-4);
 }
 .verdict-icon {
   flex: none; display: inline-flex; align-items: center; justify-content: center;
@@ -270,7 +302,7 @@ mark {
 .verdict-no_strong_indicators .verdict-icon { background: var(--info-fg); }
 
 /* What have you done? */
-.done { border-top: 1px solid var(--border); padding-top: 1rem; }
+.done { border-top: 1px solid var(--border); padding-top: var(--section-gap); }
 .state-buttons { display: grid; grid-template-columns: 1fr; gap: 0.5rem; }
 .btn-state {
   min-height: 56px; font-size: 1.05rem;
@@ -280,7 +312,7 @@ mark {
 
 .action-card {
   border: 1px solid; border-left-width: 6px; border-radius: var(--radius);
-  padding: 1.1rem; margin-top: 0.75rem; box-shadow: var(--shadow); background: var(--surface);
+  padding: var(--card-pad); margin-top: var(--space-4); box-shadow: var(--shadow); background: var(--surface);
 }
 .action-card h3 { font-size: 1.25rem; }
 .urgency-label { display: inline-block; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.25rem; }
@@ -296,11 +328,34 @@ mark {
 .step-note { color: var(--muted); font-size: 0.92rem; margin: 0.25rem 0 0; }
 .urgency-low .step-note, .urgency-medium .step-note, .urgency-high .step-note, .urgency-critical .step-note { color: var(--text); }
 
-.share { display: grid; grid-template-columns: 1fr; gap: 0.6rem; margin-top: 1.25rem; }
+.share { display: grid; grid-template-columns: 1fr; gap: var(--space-3); }
 .report-details summary { cursor: pointer; color: var(--red); min-height: 44px; display: flex; align-items: center; }
 .report-text {
   white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.88rem;
   background: var(--bg); padding: 0.75rem; border-radius: 8px; margin: 0;
+}
+
+/* Expanders: height 0 -> auto with the grid-rows trick. The inner box clips
+   only while closed/opening, so card shadows and focus rings are not cut. */
+.expander { display: grid; grid-template-rows: 0fr; }
+.expander.is-open { grid-template-rows: 1fr; }
+.expander > .expander-inner { min-height: 0; overflow: hidden; }
+.expander.is-open > .expander-inner { overflow: visible; }
+#result-region > .expander-inner > * { margin-top: var(--section-gap); }
+
+/* Skeletons: fixed-size grey placeholders (decorative, aria-hidden). */
+.skeleton { display: grid; gap: var(--space-4); }
+.sk-block { border-radius: 8px; background: #ece6dd; }
+.sk-line { height: 2.25rem; width: 55%; }
+.sk-medium { height: 6rem; }
+.sk-tall { height: 10rem; }
+.action-card.is-loading::after {
+  content: ""; display: block; height: 7.5rem; margin-top: var(--space-3); border-radius: 8px;
+  background:
+    linear-gradient(#ece6dd, #ece6dd) 0 0 / 70% 1.25rem no-repeat,
+    linear-gradient(#ece6dd, #ece6dd) 0 2.25rem / 100% 1.25rem no-repeat,
+    linear-gradient(#ece6dd, #ece6dd) 0 4.5rem / 85% 1.25rem no-repeat,
+    linear-gradient(#ece6dd, #ece6dd) 0 6.25rem / 40% 1.25rem no-repeat;
 }
 
 /* Footer: the woven strip again, then small muted text. */
@@ -308,6 +363,7 @@ mark {
 .site-footer::before { margin-bottom: 1rem; }
 
 @media (min-width: 48rem) {
+  :root { --section-gap: var(--space-8); --card-pad: var(--space-6); }
   .btn-primary { width: auto; }
   .evidence { grid-template-columns: repeat(3, 1fr); }
   .state-buttons { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
@@ -364,6 +420,29 @@ mark {
   .is-revealing .reveal-marks > mark:nth-of-type(n+6) { animation-delay: 460ms; }
 
   .status.is-loading::before { animation: xo-pulse 1s ease-in-out infinite; }
+
+  /* Expanders grow smoothly; the inner box stays clipped until the grow ends. */
+  @keyframes xo-unclip {
+    from { overflow: hidden; }
+    to { overflow: visible; }
+  }
+  .expander { transition: grid-template-rows 280ms ease-out; }
+  /* The scroll target is measured while the section still starts 8px low
+     (xo-reveal), so add those 8px to land 16px below the viewport top. */
+  #result-heading { scroll-margin-top: calc(var(--space-4) + var(--card-pad) + 8px); }
+  #action-heading { scroll-margin-top: calc(var(--space-4) + var(--card-pad) + 1.9rem + 8px); }
+  .expander.is-open > .expander-inner { animation: xo-unclip 280ms step-end both; }
+
+  /* Skeleton shimmer. */
+  @keyframes xo-shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: 0 0; }
+  }
+  .sk-block {
+    background: linear-gradient(90deg, #ece6dd 0%, #ece6dd 40%, #f6f2ec 50%, #ece6dd 60%, #ece6dd 100%) 100% 0 / 250% 100%;
+    animation: xo-shimmer 1.4s ease-in-out infinite;
+  }
+  .action-card.is-loading::after { animation: xo-pulse 1.2s ease-in-out infinite; }
 }
 
 @media (prefers-reduced-motion: reduce) {
