@@ -195,7 +195,7 @@ function getModels() {
 function errorStatus(err) {
   if (!err) return undefined;
   if (Number.isInteger(err.status)) return err.status;
-  const m = /(429|503)|RESOURCE_EXHAUSTED|UNAVAILABLE/.exec(String(err.message || ''));
+  const m = /\b(429|503)\b|RESOURCE_EXHAUSTED|UNAVAILABLE/.exec(String(err.message || ''));
   if (!m) return undefined;
   if (m[1]) return Number(m[1]);
   return m[0] === 'RESOURCE_EXHAUSTED' ? 429 : 503;
